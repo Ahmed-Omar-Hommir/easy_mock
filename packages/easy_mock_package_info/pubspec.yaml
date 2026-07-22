@@ -1,0 +1,20 @@
+name: easy_mock_package_info
+description: >-
+  Readable test mock for package_info_plus. Sets PackageInfo through the
+  package's own setMockInitialValues seam (it caches the result, so a raw
+  channel mock would be unreliable).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  package_info_plus: ^10.1.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

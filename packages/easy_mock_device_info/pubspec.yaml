@@ -1,0 +1,21 @@
+name: easy_mock_device_info
+description: >-
+  Readable test mock for device_info_plus, built on easy_mock_channel. Set the
+  device info the channel returns, with no dependency on device_info_plus — it
+  speaks the channel's raw map.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  easy_mock_channel:
+    path: ../easy_mock_channel
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

@@ -1,0 +1,21 @@
+name: easy_mock_permission_handler
+description: >-
+  Readable test mock for the permission_handler platform channel, built on
+  easy_mock_channel. Narrate scenarios (granted / denied / service status) with
+  no dependency on permission_handler — it speaks the channel's raw codes.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  easy_mock_channel:
+    path: ../easy_mock_channel
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
