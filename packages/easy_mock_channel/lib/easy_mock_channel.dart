@@ -1,5 +1,97 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stack_trace/stack_trace.dart';
+
+/// Fails the current test if the app sends a message on a platform channel that
+/// has no registered mock, instead of hanging on the real platform or silently
+/// returning null. The failure names the channel, the method, and the call site
+/// that triggered it.
+///
+/// Flutter's own framework channels (`flutter/*` and `dev.flutter/channel-buffers`)
+/// always pass through to the real test delegate. Pass [allow] to let extra
+/// channels through by exact name or prefix. Any channel stubbed with
+/// [mockChannel] (or another mock handler) is delegated to that mock as usual.
+///
+/// Install it once per test, alongside your other mock installers:
+///
+/// ```dart
+/// installUnmockedChannelGuard();
+/// ```
+///
+/// The guard removes itself on teardown.
+void installUnmockedChannelGuard({Set<String> allow = const {}}) {
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+  final hits = <String, String>{};
+
+  bool isAllowed(String channel) =>
+      channel.startsWith('flutter/') ||
+      channel == 'dev.flutter/channel-buffers' ||
+      allow.any((prefix) => channel == prefix || channel.startsWith(prefix));
+
+  messenger.allMessagesHandler = (channel, handler, message) {
+    if (handler != null) return handler(message);
+    if (isAllowed(channel)) return messenger.delegate.send(channel, message);
+
+    final method = _decodeMethod(message);
+    hits.putIfAbsent(
+      '$channel#$method',
+      () => '$channel · $method\n${_callSite(Chain.current())}',
+    );
+    return Future<ByteData?>.error(
+      StateError('MissingChannelMock: channel "$channel", method "$method".'),
+    );
+  };
+
+  addTearDown(() {
+    messenger.allMessagesHandler = null;
+    if (hits.isEmpty) return;
+    fail(
+      'Unmocked platform channel(s) called during the test — register a mock '
+      '(mockChannel(...)) or allow the channel:\n\n'
+      '${hits.values.map((hit) => '  • $hit').join('\n\n')}',
+    );
+  });
+}
+
+const _guardCodec = StandardMethodCodec();
+
+String _decodeMethod(ByteData? message) {
+  if (message == null) return '<unknown>';
+  try {
+    return _guardCodec.decodeMethodCall(message).method;
+  } catch (_) {
+    return '<unknown>';
+  }
+}
+
+bool _isNoiseFrame(Frame frame) {
+  final uri = frame.uri.toString();
+  return uri.startsWith('dart:') ||
+      uri.startsWith('package:flutter/') ||
+      uri.startsWith('package:flutter_test/') ||
+      uri.startsWith('package:stack_trace/') ||
+      uri.startsWith('package:easy_mock_channel/');
+}
+
+String _framePackage(Frame frame) =>
+    frame.uri.scheme == 'package' ? frame.uri.pathSegments.first : frame.uri.path;
+
+/// Renders the async chain as the caller's own frames, deepest first, collapsing
+/// consecutive frames from the same package so a single library only shows once.
+String _callSite(Chain chain, {int max = 6}) {
+  final lines = <String>[];
+  String? lastPackage;
+  for (final frame in chain.terse.traces.expand((trace) => trace.frames)) {
+    if (_isNoiseFrame(frame)) continue;
+    final package = _framePackage(frame);
+    if (package == lastPackage) continue;
+    lastPackage = package;
+    lines.add('      ${frame.member ?? '<fn>'}  (${frame.location})');
+    if (lines.length == max) break;
+  }
+  return lines.isEmpty ? '      origin unknown' : lines.join('\n');
+}
 
 /// Stubs a platform [MethodChannel] in tests with a fluent `when` API and
 /// records every call for verification. The mock handler is installed
