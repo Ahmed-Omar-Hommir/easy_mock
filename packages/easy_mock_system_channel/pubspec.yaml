@@ -1,0 +1,23 @@
+name: easy_mock_system_channel
+description: >-
+  Default test mocks for Flutter's SystemChannels, built on easy_mock_channel.
+  Answers HapticFeedback / SystemChrome / SystemSound / Clipboard and the other
+  framework method channels with sensible defaults (each method returns null and
+  is recorded) so they never reach the real platform — override and verify per
+  channel. Uses the correct codec per channel; no extra dependencies.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  easy_mock_channel:
+    path: ../easy_mock_channel
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
