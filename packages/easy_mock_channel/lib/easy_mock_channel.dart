@@ -7,10 +7,10 @@ import 'package:stack_trace/stack_trace.dart';
 /// returning null. The failure names the channel, the method, and the call site
 /// that triggered it.
 ///
-/// Flutter's own framework channels (`flutter/*` and `dev.flutter/channel-buffers`)
-/// always pass through to the real test delegate. Pass [allow] to let extra
-/// channels through by exact name or prefix. Any channel stubbed with
-/// [mockChannel] (or another mock handler) is delegated to that mock as usual.
+/// The guard is strict: any channel without a handler fails the test — mock the
+/// channels your test touches (`mockChannel(...)`, or the `easy_mock_*`
+/// installers). A channel stubbed with [mockChannel] (or any other registered
+/// handler) is delegated to that mock as usual.
 ///
 /// Install it once per test, alongside your other mock installers:
 ///
@@ -19,19 +19,13 @@ import 'package:stack_trace/stack_trace.dart';
 /// ```
 ///
 /// The guard removes itself on teardown.
-void installUnmockedChannelGuard({Set<String> allow = const {}}) {
+void installUnmockedChannelGuard() {
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
   final hits = <String, String>{};
 
-  bool isAllowed(String channel) =>
-      channel.startsWith('flutter/') ||
-      channel == 'dev.flutter/channel-buffers' ||
-      allow.any((prefix) => channel == prefix || channel.startsWith(prefix));
-
   messenger.allMessagesHandler = (channel, handler, message) {
     if (handler != null) return handler(message);
-    if (isAllowed(channel)) return messenger.delegate.send(channel, message);
 
     final method = _decodeMethod(message);
     hits.putIfAbsent(
@@ -74,8 +68,9 @@ bool _isNoiseFrame(Frame frame) {
       uri.startsWith('package:easy_mock_channel/');
 }
 
-String _framePackage(Frame frame) =>
-    frame.uri.scheme == 'package' ? frame.uri.pathSegments.first : frame.uri.path;
+String _framePackage(Frame frame) => frame.uri.scheme == 'package'
+    ? frame.uri.pathSegments.first
+    : frame.uri.path;
 
 /// Renders the async chain as the caller's own frames, deepest first, collapsing
 /// consecutive frames from the same package so a single library only shows once.
@@ -120,7 +115,10 @@ class MockMethodChannel {
   /// Installs the mock handler for the channel called [name]. Prefer the
   /// [mockChannel] shorthand. Pass [codec] when the channel uses something other
   /// than [StandardMethodCodec].
-  MockMethodChannel(this.name, {MethodCodec codec = const StandardMethodCodec()}) {
+  MockMethodChannel(
+    this.name, {
+    MethodCodec codec = const StandardMethodCodec(),
+  }) {
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     final channel = MethodChannel(name, codec);

@@ -1,3 +1,4 @@
+import 'package:easy_mock_channel/easy_mock_channel.dart';
 import 'package:easy_mock_system_channel/easy_mock_system_channel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -53,23 +54,33 @@ void main() {
     expect(mockSystemChannels.restoration.verify(method: 'get').length, 1);
   });
 
-  test('flutter/textinput is not mocked unless opted in', () {
+  test('flutter/textinput is not exposed as a mock channel', () {
     mockSystemChannels.install();
 
-    expect(() => mockSystemChannels.textInput, throwsStateError);
+    expect(
+      () => mockSystemChannels.channel('flutter/textinput'),
+      throwsStateError,
+    );
   });
 
-  test('install(includeTextInput: true) exposes the textinput mock', () async {
-    mockSystemChannels.install(includeTextInput: true);
-    mockSystemChannels.textInput.when(method: 'TextInput.clearClient', returns: null);
+  test('a strict guard is not tripped by an unhandled flutter/textinput call', () async {
+    installUnmockedChannelGuard();
+    mockSystemChannels.install();
+    // Simulate patrol having unregistered the framework's TestTextInput.
+    TestWidgetsFlutterBinding.instance.testTextInput.unregister();
 
-    const textInput = MethodChannel('flutter/textinput', JSONMethodCodec());
-    await textInput.invokeMethod<void>('TextInput.clearClient');
-
-    expect(
-      mockSystemChannels.textInput.verify(method: 'TextInput.clearClient').length,
-      1,
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final reply = await messenger.send(
+      'flutter/textinput',
+      const JSONMethodCodec().encodeMethodCall(
+        const MethodCall('TextInput.clearClient'),
+      ),
     );
+
+    // Relaxed to null rather than recorded — otherwise the guard's teardown
+    // would fail this test.
+    expect(reply, isNull);
   });
 
   test('channel(name) reaches any installed channel', () async {

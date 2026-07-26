@@ -20,6 +20,9 @@ class _ChannelSpec {
 // (most are StandardMethodCodec; the JSON ones are called out). Each unstubbed
 // method returns null — the [defaults] only cover the few methods whose callers
 // would choke on a null reply.
+//
+// flutter/textinput is deliberately absent: it is handled by the framework's
+// TestTextInput (see [install]), not by a plain mock.
 const _specs = <_ChannelSpec>[
   _ChannelSpec('flutter/platform', _json, {
     'Clipboard.hasStrings': {'value': false},
@@ -33,7 +36,9 @@ const _specs = <_ChannelSpec>[
   _ChannelSpec('flutter/spellcheck', _standard),
   _ChannelSpec('flutter/scribe', _json),
   _ChannelSpec('flutter/menu', _standard),
-  _ChannelSpec('flutter/keyboard', _standard, {'getKeyboardState': <int, int>{}}),
+  _ChannelSpec('flutter/keyboard', _standard, {
+    'getKeyboardState': <int, int>{},
+  }),
   _ChannelSpec('flutter/restoration', _standard),
   _ChannelSpec('flutter/platform_views', _standard),
   _ChannelSpec('flutter/platform_views_2', _standard),
@@ -43,10 +48,6 @@ const _specs = <_ChannelSpec>[
   _ChannelSpec('flutter/backgesture', _standard),
   _ChannelSpec('flutter/skia', _json),
 ];
-
-// Left out by default: the test framework's TestTextInput owns this channel, so
-// mocking it breaks tester.enterText. Opt in with install(includeTextInput: true).
-const _textInputSpec = _ChannelSpec('flutter/textinput', _json);
 
 /// Default mocks for Flutter's [SystemChannels]. Install once per test:
 ///
@@ -64,19 +65,37 @@ class MockSystemChannels {
 
   final Map<String, MockMethodChannel> _channels = {};
 
-  /// Installs the default mocks and records every call. `flutter/textinput` is
-  /// skipped unless [includeTextInput] is set (see [_textInputSpec]). The
-  /// harness calls this once per test; mocks are removed on teardown.
-  void install({bool includeTextInput = false}) {
+  /// Installs the default mocks and records every call. The harness calls this
+  /// once per test; mocks are removed on teardown.
+  ///
+  /// `flutter/textinput` is not mocked with a canned reply — that channel is owned
+  /// by the framework's `TestTextInput`, which patrol registers only during
+  /// `enterText` and unregisters afterwards. A null reply on it is harmless, so
+  /// [_relaxTextInput] keeps a strict unmocked-channel guard from failing on the
+  /// windows where it has no handler (see [installUnmockedChannelGuard]). Install
+  /// this AFTER the guard so it can wrap it.
+  void install() {
     _channels.clear();
-    for (final spec in [..._specs, if (includeTextInput) _textInputSpec]) {
+    for (final spec in _specs) {
       final mock = mockChannel(spec.name, codec: spec.codec);
       spec.defaults.forEach(
         (method, value) => mock.when(method: method, returns: value),
       );
       _channels[spec.name] = mock;
     }
+    _relaxTextInput();
     addTearDown(_channels.clear);
+  }
+
+  void _relaxTextInput() {
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final inner = messenger.allMessagesHandler;
+    if (inner == null) return;
+    messenger.allMessagesHandler = (channel, handler, message) {
+      if (channel == 'flutter/textinput' && handler == null) return null;
+      return inner(channel, handler, message);
+    };
   }
 
   /// The mock for the channel called [name] (e.g. `'flutter/platform'`) —
@@ -86,7 +105,7 @@ class MockSystemChannels {
     if (mock == null) {
       throw StateError(
         'No SystemChannels mock for "$name". Call mockSystemChannels.install() '
-        'first; "flutter/textinput" needs install(includeTextInput: true).',
+        'first. (flutter/textinput is handled by TestTextInput, not mocked here.)',
       );
     }
     return mock;
@@ -107,7 +126,4 @@ class MockSystemChannels {
 
   /// `flutter/restoration` — state restoration `get` / `put`.
   MockMethodChannel get restoration => channel('flutter/restoration');
-
-  /// `flutter/textinput` — only present after `install(includeTextInput: true)`.
-  MockMethodChannel get textInput => channel('flutter/textinput');
 }
