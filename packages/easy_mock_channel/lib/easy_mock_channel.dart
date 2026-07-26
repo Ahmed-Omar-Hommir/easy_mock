@@ -104,18 +104,26 @@ String _callSite(Chain chain, {int max = 6}) {
 ///
 /// expect(channel.verify(method: 'requestPermissions').length, 1);
 /// ```
-MockMethodChannel mockChannel(String name) => MockMethodChannel(name);
+///
+/// Pass [codec] for channels that don't use the default [StandardMethodCodec]
+/// (e.g. `flutter/platform` uses [JSONMethodCodec]) — it must match the real
+/// channel's codec or messages won't decode.
+MockMethodChannel mockChannel(
+  String name, {
+  MethodCodec codec = const StandardMethodCodec(),
+}) => MockMethodChannel(name, codec: codec);
 
 const Object _anyArguments = Object();
 
 /// A mock for the single [MethodChannel] named [name].
 class MockMethodChannel {
   /// Installs the mock handler for the channel called [name]. Prefer the
-  /// [mockChannel] shorthand.
-  MockMethodChannel(this.name) {
+  /// [mockChannel] shorthand. Pass [codec] when the channel uses something other
+  /// than [StandardMethodCodec].
+  MockMethodChannel(this.name, {MethodCodec codec = const StandardMethodCodec()}) {
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
-    final channel = MethodChannel(name);
+    final channel = MethodChannel(name, codec);
     messenger.setMockMethodCallHandler(channel, _onCall);
     addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
   }
