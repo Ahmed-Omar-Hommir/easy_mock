@@ -1,0 +1,20 @@
+name: easy_mock_io
+description: >-
+  In-memory dart:io for Flutter tests. MockMemoryIO.install() swaps
+  IOOverrides.global for a MemoryFileSystem, so File and Directory access runs in
+  memory and never touches disk. File locks are no-ops (parallel tests can't
+  deadlock on the same file), the UNIT_TEST_ASSETS folder is seeded into the
+  memory filesystem, and /epay_root is pre-created.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  file: ^7.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
