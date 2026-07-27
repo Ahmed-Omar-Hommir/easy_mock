@@ -12,7 +12,9 @@ void main() {
     await HapticFeedback.vibrate();
 
     expect(
-      mockSystemChannels.platform.verify(method: 'HapticFeedback.vibrate').length,
+      mockSystemChannels.platform
+          .verify(method: 'HapticFeedback.vibrate')
+          .length,
       1,
     );
   });
@@ -63,30 +65,36 @@ void main() {
     );
   });
 
-  test('a strict guard is not tripped by an unhandled flutter/textinput call', () async {
-    installUnmockedChannelGuard();
-    mockSystemChannels.install();
-    // Simulate patrol having unregistered the framework's TestTextInput.
-    TestWidgetsFlutterBinding.instance.testTextInput.unregister();
+  test(
+    'a strict guard is not tripped by an unhandled flutter/textinput call',
+    () async {
+      installUnmockedChannelGuard();
+      mockSystemChannels.install();
+      // Simulate patrol having unregistered the framework's TestTextInput.
+      TestWidgetsFlutterBinding.instance.testTextInput.unregister();
 
-    final messenger =
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
-    final reply = await messenger.send(
-      'flutter/textinput',
-      const JSONMethodCodec().encodeMethodCall(
-        const MethodCall('TextInput.clearClient'),
-      ),
-    );
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      final reply = await messenger.send(
+        'flutter/textinput',
+        const JSONMethodCodec().encodeMethodCall(
+          const MethodCall('TextInput.clearClient'),
+        ),
+      );
 
-    // Relaxed to null rather than recorded — otherwise the guard's teardown
-    // would fail this test.
-    expect(reply, isNull);
-  });
+      // Relaxed to null rather than recorded — otherwise the guard's teardown
+      // would fail this test.
+      expect(reply, isNull);
+    },
+  );
 
   test('channel(name) reaches any installed channel', () async {
     mockSystemChannels.install();
 
-    expect(mockSystemChannels.channel('flutter/platform'), isA<MockMethodChannel>());
+    expect(
+      mockSystemChannels.channel('flutter/platform'),
+      isA<MockMethodChannel>(),
+    );
     expect(
       () => mockSystemChannels.channel('flutter/does_not_exist'),
       throwsStateError,
