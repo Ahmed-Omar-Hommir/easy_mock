@@ -29,7 +29,7 @@ test('writes go to memory, not disk', () {
   immediately, so tests that open the same path in parallel can't deadlock on an
   exclusive lock the memory filesystem wouldn't honour anyway.
 - **Assets are seeded** from the folder named by the `UNIT_TEST_ASSETS`
-  environment variable, and `/epay_root` is created up front.
+  environment variable, and `/app_root` is created up front.
 
 `install` sets `IOOverrides.global`; reset it with `IOOverrides.global = null`
 in `tearDown` (or install a fresh one per test) so overrides don't leak.

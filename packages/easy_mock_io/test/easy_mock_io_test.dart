@@ -19,10 +19,10 @@ void main() {
     expect(File('/notes/todo.txt').existsSync(), isFalse);
   });
 
-  test('pre-creates /epay_root', () {
+  test('pre-creates /app_root', () {
     mockMemoryIO.install();
 
-    expect(Directory('/epay_root').existsSync(), isTrue);
+    expect(Directory('/app_root').existsSync(), isTrue);
   });
 
   test('starts from a pre-seeded filesystem when one is passed', () {

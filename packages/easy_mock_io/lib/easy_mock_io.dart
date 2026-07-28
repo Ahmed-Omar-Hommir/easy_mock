@@ -16,7 +16,7 @@ class MockMemoryIO {
     final mf = memoryFile ?? MemoryFileSystem();
     seedTestAssets(mf);
 
-    mf.directory('/epay_root').createSync(recursive: true);
+    mf.directory('/app_root').createSync(recursive: true);
 
     IOOverrides.global = MemoryIOOverrides(mf);
   }

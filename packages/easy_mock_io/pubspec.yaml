@@ -4,7 +4,7 @@ description: >-
   IOOverrides.global for a MemoryFileSystem, so File and Directory access runs in
   memory and never touches disk. File locks are no-ops (parallel tests can't
   deadlock on the same file), the UNIT_TEST_ASSETS folder is seeded into the
-  memory filesystem, and /epay_root is pre-created.
+  memory filesystem, and /app_root is pre-created.
 version: 0.1.0
 publish_to: none
 
