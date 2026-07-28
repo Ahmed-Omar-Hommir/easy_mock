@@ -1,0 +1,36 @@
+name: easy_mock_firebase
+description: >-
+  Firebase test fakes for Flutter widget tests. setUpFirebasePerformanceMock()
+  stubs the Firebase Performance pigeon channel so HttpMetric calls settle under
+  the fake clock; injectFakeRemoteConfig() installs an in-memory
+  FirebaseRemoteConfigPlatform driven by a `featureFlag` handle
+  (setRemoteValues / pushUpdate) while keeping the real Remote Config Dart logic;
+  mockFirebaseMessaging.install() stubs the firebase_messaging MethodChannel
+  (permission / token / initial message); mockFirebaseAppCheck.install() and
+  mockFirebaseCrashlytics.install() swap in no-op platform instances so App
+  Check doesn't hang the fake clock and Crashlytics never hits the channel.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  firebase_core: ^4.6.0
+  firebase_core_platform_interface: ^7.0.1
+  firebase_remote_config_platform_interface: ^3.0.3
+  firebase_crashlytics_platform_interface: ^3.8.0
+  firebase_app_check_platform_interface: ^0.4.0
+  easy_mock_channel:
+    path: ../easy_mock_channel
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  # Pinned to the app's known-good versions: newer majors need firebase_core 5.x.
+  firebase_messaging: 16.2.2
+  firebase_crashlytics: 5.2.3
+  firebase_app_check: 0.4.4+1

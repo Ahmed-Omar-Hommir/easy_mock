@@ -1,0 +1,21 @@
+name: easy_mock_local_notifications
+description: >-
+  No-op FlutterLocalNotificationsPlatform for Flutter widget tests.
+  mockLocalNotifications.install() fills the `late` platform-instance field that
+  the native plugin registrant normally sets, so flutter_local_notifications'
+  initialize() / resolvePlatformSpecificImplementation() don't throw a
+  LateInitializationError under `flutter test`.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter_local_notifications_platform_interface: ^12.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_local_notifications: ^22.0.0
+  flutter_lints: ^6.0.0
