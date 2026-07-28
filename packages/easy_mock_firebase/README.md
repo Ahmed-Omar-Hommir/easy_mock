@@ -26,10 +26,13 @@ mockFirebaseAppCheck.install();
 
 ## `mockFirebaseAppCheck.install()`
 
-Swaps `FirebaseAppCheckPlatform` for a fake so `activate()` is a no-op and the
-token **auto-refresh timer never starts** — the real App Check does device
-attestation that never settles on the fake test clock, so the un-mocked boot
-hangs. `getToken()` returns a dummy token.
+Stubs the Firebase App Check **pigeon** channel (`FirebaseAppCheckHostApi`),
+keeping the real `MethodChannelFirebaseAppCheck` Dart. Without it, `activate()`
+awaits an unmocked pigeon channel that only settles on the real event loop, so
+the fake test clock hangs (same failure as Firebase Performance). `activate` /
+`setTokenAutoRefreshEnabled` resolve to void; `getToken` returns a dummy token;
+`registerTokenListener` replies null, which the plugin swallows, so no live
+token EventChannel is opened.
 
 ## `mockFirebaseCrashlytics.install()`
 
@@ -42,7 +45,7 @@ so it installs with the other mocks before the boot. Still requires
 boot itself only tears off `recordFlutterFatalError`, so it never touches
 Crashlytics; this covers the case where an error is actually routed to it.
 
-## `setUpFirebasePerformanceMock()`
+## `mockFirebasePerformance.install()`
 
 Stubs the Firebase Performance **pigeon** channel (`HttpMetric` /`Trace`
 start/stop). Without it, the Dio performance interceptor's `await metric.start()`
@@ -50,15 +53,14 @@ is routed to the real platform messenger and only completes on the real event
 loop — forcing tests to use `runAsync`. With it, those calls resolve on the fake
 clock, so the whole HTTP flow settles under `pump` / `pumpAndSettle`.
 
-## `injectFakeRemoteConfig()` + `featureFlag`
+## `mockRemoteConfig.install()`
 
-Installs an in-memory `FirebaseRemoteConfigPlatform` (call **after**
-`Firebase.initializeApp()`), keeping the real `firebase_remote_config` Dart
-logic. Drive values through the global `featureFlag`:
+Installs an in-memory `FirebaseRemoteConfigPlatform`, keeping the real
+`firebase_remote_config` Dart logic. Drive values through `mockRemoteConfig`:
 
 ```dart
-featureFlag.setRemoteValues({'show_wallet': true}); // before launching the app
-featureFlag.pushUpdate({'show_wallet': false});     // emit an onConfigUpdated event
+mockRemoteConfig.setRemoteValues({'show_wallet': true}); // before launching the app
+mockRemoteConfig.pushUpdate({'show_wallet': false});     // emit an onConfigUpdated event
 ```
 
 The app must still run its own Remote Config init (`setDefaults` /

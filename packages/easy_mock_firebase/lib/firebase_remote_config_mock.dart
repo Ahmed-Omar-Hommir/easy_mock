@@ -4,39 +4,47 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config_platform_interface/firebase_remote_config_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class MockFeatureFlags {
-  MockFeatureFlags._();
+/// Installs an in-memory `FirebaseRemoteConfigPlatform` (keeping the real Remote
+/// Config Dart, only the native side is faked). Drive flag values with
+/// [setRemoteValues] before launching the app, or [pushUpdate] to emit an
+/// `onConfigUpdated` event.
+final mockRemoteConfig = MockRemoteConfig._();
+
+class MockRemoteConfig {
+  MockRemoteConfig._();
 
   Map<String, dynamic> _value = {};
   final Map<String, dynamic> _updatedValue = {};
+  StreamController<RemoteConfigUpdate>? _streamController;
 
+  /// Sets the values a `fetch()` will activate. Call before launching the app.
   void setRemoteValues(Map<String, dynamic> value) {
     _value = value;
   }
 
+  /// Emits an `onConfigUpdated` event carrying [value]'s keys.
   void pushUpdate(Map<String, dynamic> value) {
     _updatedValue.addAll(value);
     _streamController!.add(RemoteConfigUpdate(value.keys.toSet()));
   }
-}
 
-late StreamController<RemoteConfigUpdate>? _streamController;
-
-final featureFlag = MockFeatureFlags._();
-
-/// Installs the in-memory Remote Config platform. Wired into `_bootFirebaseMocks`
-/// (core.dart), so Firebase core is already booted by the time it runs.
-void injectFakeRemoteConfig() {
-  _streamController = StreamController<RemoteConfigUpdate>.broadcast();
-  addTearDown(() {
-    featureFlag._value = {};
-    _streamController!.close();
-    _streamController = null;
-  });
-  FirebaseRemoteConfigPlatform.instance = _FakeRemoteConfig();
+  void install() {
+    _streamController = StreamController<RemoteConfigUpdate>.broadcast();
+    addTearDown(() {
+      _value = {};
+      _updatedValue.clear();
+      _streamController!.close();
+      _streamController = null;
+    });
+    FirebaseRemoteConfigPlatform.instance = _FakeRemoteConfig(this);
+  }
 }
 
 class _FakeRemoteConfig extends FirebaseRemoteConfigPlatform {
+  _FakeRemoteConfig(this._owner);
+
+  final MockRemoteConfig _owner;
+
   Map<String, dynamic> _values = {};
   Map<String, dynamic> _defaultValues = {};
   RemoteConfigSettings _settings = RemoteConfigSettings(
@@ -66,11 +74,11 @@ class _FakeRemoteConfig extends FirebaseRemoteConfigPlatform {
 
   @override
   Future<void> fetch() async {
-    _values = featureFlag._value;
-    featureFlag._value = {};
+    _values = _owner._value;
+    _owner._value = {};
 
-    _values.addAll(featureFlag._updatedValue);
-    featureFlag._updatedValue.clear();
+    _values.addAll(_owner._updatedValue);
+    _owner._updatedValue.clear();
   }
 
   @override
@@ -101,5 +109,6 @@ class _FakeRemoteConfig extends FirebaseRemoteConfigPlatform {
   RemoteConfigSettings get settings => _settings;
 
   @override
-  Stream<RemoteConfigUpdate> get onConfigUpdated => _streamController!.stream;
+  Stream<RemoteConfigUpdate> get onConfigUpdated =>
+      _owner._streamController!.stream;
 }

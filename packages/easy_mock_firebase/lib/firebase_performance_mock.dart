@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Mocks the Firebase Performance pigeon channel.
+/// Stubs the Firebase Performance pigeon channel.
 ///
 /// Without a mock handler, its `HttpMetric#start`/`stop` calls (awaited by the
 /// Dio performance interceptor on every request) are routed to the real
@@ -9,28 +9,34 @@ import 'package:flutter_test/flutter_test.dart';
 /// tests to drive the request with `runAsync` instead of `pump`. Stubbing the
 /// channel makes those calls resolve on the fake clock, so the whole HTTP flow
 /// settles under `pump`/`pumpAndSettle`.
-void setUpFirebasePerformanceMock() {
-  const codec = StandardMessageCodec();
-  const prefix =
-      'dev.flutter.pigeon.firebase_performance_platform_interface.'
-      'FirebasePerformanceHostApi.';
-  final messenger =
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+final mockFirebasePerformance = MockFirebasePerformance._();
 
-  // Pigeon wraps a successful host reply as a single-element list `[result]`.
-  void stub(String method, Object? result) {
-    final channel = '$prefix$method';
-    messenger.setMockMessageHandler(
-      channel,
-      (_) async => codec.encodeMessage(<Object?>[result]),
-    );
-    addTearDown(() => messenger.setMockMessageHandler(channel, null));
+class MockFirebasePerformance {
+  MockFirebasePerformance._();
+
+  void install() {
+    const codec = StandardMessageCodec();
+    const prefix =
+        'dev.flutter.pigeon.firebase_performance_platform_interface.'
+        'FirebasePerformanceHostApi.';
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
+    // Pigeon wraps a successful host reply as a single-element list `[result]`.
+    void stub(String method, Object? result) {
+      final channel = '$prefix$method';
+      messenger.setMockMessageHandler(
+        channel,
+        (_) async => codec.encodeMessage(<Object?>[result]),
+      );
+      addTearDown(() => messenger.setMockMessageHandler(channel, null));
+    }
+
+    stub('startHttpMetric', 1);
+    stub('stopHttpMetric', null);
+    stub('startTrace', 1);
+    stub('stopTrace', null);
+    stub('setPerformanceCollectionEnabled', null);
+    stub('isPerformanceCollectionEnabled', false);
   }
-
-  stub('startHttpMetric', 1); // handle id
-  stub('stopHttpMetric', null);
-  stub('startTrace', 1);
-  stub('stopTrace', null);
-  stub('setPerformanceCollectionEnabled', null);
-  stub('isPerformanceCollectionEnabled', false);
 }
