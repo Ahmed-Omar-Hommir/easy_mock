@@ -33,9 +33,12 @@ hangs. `getToken()` returns a dummy token.
 
 ## `mockFirebaseCrashlytics.install()`
 
-Swaps `FirebaseCrashlyticsPlatform` for a no-op fake so `log` / `recordError` /
-… never reach the native channel. Requires `setUpFirebaseCoreMock()` (above) —
-without the seeded constant, Crashlytics throws before the fake is reached. The
+Stubs the `plugins.flutter.io/firebase_crashlytics` MethodChannel via
+`easy_mock_channel`, so the real `MethodChannelFirebaseCrashlytics` Dart runs but
+`log` / `recordError` / … never reach the native side. Needs no `Firebase.app()`,
+so it installs with the other mocks before the boot. Still requires
+`setUpFirebaseCoreMock()` (above) — the platform interface asserts
+`isCrashlyticsCollectionEnabled` in `instanceFor`, before any channel call. The
 boot itself only tears off `recordFlutterFatalError`, so it never touches
 Crashlytics; this covers the case where an error is actually routed to it.
 
