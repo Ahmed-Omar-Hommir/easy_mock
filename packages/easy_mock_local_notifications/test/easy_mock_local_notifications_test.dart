@@ -8,7 +8,7 @@ void main() {
     mockLocalNotifications.install();
   });
 
-  test('initialize() no longer throws LateInitializationError', () async {
+  test('initialize() runs the real impl against the mocked channel', () async {
     final plugin = FlutterLocalNotificationsPlugin();
 
     final result = await plugin.initialize(
@@ -17,11 +17,11 @@ void main() {
       ),
     );
 
-    // The android impl isn't registered, so the resolver returns null → no-op.
-    expect(result, isNull);
+    expect(result, isTrue);
+    expect(mockLocalNotifications.verify('initialize'), hasLength(1));
   });
 
-  test('query methods are no-ops instead of throwing', () async {
+  test('query methods return empty instead of throwing', () async {
     expect(
       await FlutterLocalNotificationsPlatform.instance.getActiveNotifications(),
       isEmpty,

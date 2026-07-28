@@ -12,13 +12,13 @@ LateInitializationError: Field '_instance@…' has not been initialized.
 
 ## Why it happens
 
-`FlutterLocalNotificationsPlatform.instance` is a `late static` field that's set
-**only when the native plugin registers itself** (the `GeneratedPluginRegistrant`
-at real app startup). `flutter test` never runs the registrant, and the
-app-facing `FlutterLocalNotificationsPlugin()` constructor doesn't set it either.
-Meanwhile `initialize()` still enters the `defaultTargetPlatform == android`
-branch (android is the flutter-test default) and reads that unset field → crash.
-A method-channel mock can't help — this throws **before** any channel call.
+`FlutterLocalNotificationsPlatform.instance` is a `late static` field set **only
+when the native plugin registers itself** (the `GeneratedPluginRegistrant` at
+real app startup). `flutter test` never runs the registrant, and the app-facing
+`FlutterLocalNotificationsPlugin()` constructor doesn't set it either. Meanwhile
+`initialize()` still enters the `defaultTargetPlatform == android` branch
+(android is the flutter-test default) and reads that unset field → crash, before
+any channel call.
 
 ## Usage
 
@@ -28,7 +28,10 @@ import 'package:easy_mock_local_notifications/easy_mock_local_notifications.dart
 setUp(() => mockLocalNotifications.install());
 ```
 
-`install()` sets `FlutterLocalNotificationsPlatform.instance` to a no-op. The
-plugin's per-platform resolvers then return `null` (exactly as on an unsupported
-platform), so your real code runs and `initialize()` / `show()` / … quietly do
-nothing instead of crashing.
+`install()` registers the **real** `AndroidFlutterLocalNotificationsPlugin` (via
+its `registerWith()`) so `.instance` is set, and stubs the
+`dexterous.com/flutter/local_notifications` MethodChannel with `easy_mock_channel`.
+The real plugin Dart runs — serializing settings, mapping notification details —
+but every native call is intercepted (`initialize` → `true`, queries → empty,
+`show`/`cancel`/… → no-op). Use `mockLocalNotifications.channel` to override or
+`verify('show')` to assert.
