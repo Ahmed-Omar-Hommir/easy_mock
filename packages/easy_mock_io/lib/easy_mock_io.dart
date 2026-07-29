@@ -9,23 +9,31 @@ export 'package:file/memory.dart' show MemoryFileSystem;
 
 const mockMemoryIO = MockMemoryIO._();
 
+class MemoryIOConfig {
+  const MemoryIOConfig({
+    this.rootDirPath = '/app_root',
+    this.testAssetsDirPath = 'test/assets',
+  });
+
+  final String rootDirPath;
+  final String testAssetsDirPath;
+}
+
 class MockMemoryIO {
   const MockMemoryIO._();
 
-  void install([MemoryFileSystem? memoryFile]) {
+  void install([
+    MemoryFileSystem? memoryFile,
+    MemoryIOConfig config = const MemoryIOConfig(),
+  ]) {
     final mf = memoryFile ?? MemoryFileSystem();
-    seedTestAssets(mf);
+    _seedProjectAssets(mf);
+    _seedAssets(mf, config);
 
-    mf.directory('/app_root').createSync(recursive: true);
+    mf.directory(config.rootDirPath).createSync(recursive: true);
 
     IOOverrides.global = MemoryIOOverrides(mf);
   }
-}
-
-void x() async {
-  final file = File('./image.png');
-  await file.exists();
-  await file.readAsBytes();
 }
 
 base class MemoryIOOverrides extends IOOverrides {
@@ -294,7 +302,7 @@ class _NoLockFile implements File {
   String resolveSymbolicLinksSync() => delegate.resolveSymbolicLinksSync();
 }
 
-void seedTestAssets(MemoryFileSystem fs) {
+void _seedProjectAssets(MemoryFileSystem fs) {
   final cache = _loadAssetsFromDisk();
   cache.forEach((path, bytes) {
     fs.file(path)
@@ -313,4 +321,15 @@ Map<String, Uint8List> _loadAssetsFromDisk() {
     if (e is File) out[e.path] = e.readAsBytesSync();
   }
   return out;
+}
+
+void _seedAssets(MemoryFileSystem memoryFile, MemoryIOConfig config) {
+  final dir = Directory(config.testAssetsDirPath);
+  if (!dir.existsSync()) return;
+  for (final entity in dir.listSync(recursive: true)) {
+    if (entity is! File) continue;
+    memoryFile.file(entity.path)
+      ..createSync(recursive: true)
+      ..writeAsBytesSync(entity.readAsBytesSync());
+  }
 }
