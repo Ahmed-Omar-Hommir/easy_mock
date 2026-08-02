@@ -26,26 +26,10 @@ part of '../easy_mock_http.dart';
 // [Matcher] — [any] for "don't care", or a flutter_test matcher like
 // `greaterThan(3)` / `contains('x')` for finer checks.
 
-/// Installs a fresh [MockHttp] as `HttpOverrides.global` and removes it on
-/// teardown. Build transport clients (Dio, `http.Client`, repositories) AFTER
-/// this call so they pick up the override.
-MockHttp? _http;
-MockHttp get http {
-  if (_http == null) {
-    throw Exception("You are missing setUpMockHttp.");
-  }
-  return _http!;
-}
-
-void setUpMockHttp() {
-  _http = MockHttp();
-  final http = _http!;
-  HttpOverrides.global = http.overrides;
-  addTearDown(() {
-    HttpOverrides.global = null;
-    http._verifyExpectations();
-  });
-}
+/// The HTTP mock. Call [MockHttp.install] to route `dart:io` traffic through
+/// it, then stub with [MockHttp.when] / [MockHttp.expect] and assert with
+/// [MockHttp.verify].
+final mockHttp = MockHttp._();
 
 /// Matches any value in a body matcher, e.g. `{'id': any(), 'name': 'Sam'}`.
 Matcher any() => anything;
@@ -53,8 +37,23 @@ Matcher any() => anything;
 /// Stub registry and request recorder behind [mockHttp]. Reuses
 /// [MockHttpOverrides] for the actual `dart:io` interception.
 class MockHttp {
+  MockHttp._();
+
   late final MockHttpOverrides overrides = MockHttpOverrides(_handle);
   final List<_Stub> _stubs = <_Stub>[];
+
+  /// Installs this mock as `HttpOverrides.global`, resetting stubs and recorded
+  /// requests, and removes it on teardown. Build transport clients (Dio,
+  /// `http.Client`, repositories) AFTER this call so they pick up the override.
+  void install() {
+    _stubs.clear();
+    overrides.requests.clear();
+    HttpOverrides.global = overrides;
+    addTearDown(() {
+      HttpOverrides.global = null;
+      _verifyExpectations();
+    });
+  }
 
   /// Every request seen, in order — the raw recording for ad-hoc assertions.
   List<MockHttpRequest> get requests => overrides.requests;

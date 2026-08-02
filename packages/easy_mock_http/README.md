@@ -19,8 +19,8 @@ import 'package:easy_mock_http/easy_mock_http.dart';
 
 test('ping replies pong', () async {
   // Arrange
-  final http = mockHttp();
-  http.when.get(
+  mockHttp.install();
+  mockHttp.when.get(
     'https://www.example.com/api/ping',
     response: {'pong': true},
   );
@@ -30,7 +30,7 @@ test('ping replies pong', () async {
 
   // Assert
   expect(response.data, {'pong': true});
-  http.verify.get('/api/ping').calledOnce;
+  mockHttp.verify.get('/api/ping').calledOnce;
 });
 ```
 
@@ -39,7 +39,7 @@ test('ping replies pong', () async {
 Every verb (`get` / `post` / `put` / `delete` / `patch` / `head`) takes:
 
 ```dart
-http.when.post(
+mockHttp.when.post(
   url,                       // String path, full URL, or RegExp
   body: {'user': any()},     // match request body (subset; values may be Matchers)
   headers: {'Authorization': any()},  // match request headers (case-insensitive)
@@ -56,19 +56,19 @@ Unmatched requests get a loud 404, so a typo'd URL fails the test instead of
 silently passing. For dynamic replies, chain instead:
 
 ```dart
-http.when.get('/v1/time').replyWith((request) => MockHttpResponse.json({...}));
+mockHttp.when.get('/v1/time').replyWith((request) => MockHttpResponse.json({...}));
 ```
 
-`http.expect.get(...)` works like `when` but also fails the test on teardown
+`mockHttp.expect.get(...)` works like `when` but also fails the test on teardown
 if the request never arrives.
 
 ## Verifying
 
 ```dart
-http.verify.post('/v1/login', body: {'user': 'sam'}).calledOnce;
-http.verify.get('/v1/cities', query: {'page': 2}).called(2);
-http.verify.delete('/v1/session').never;
-http.requests;  // raw recording of everything sent
+mockHttp.verify.post('/v1/login', body: {'user': 'sam'}).calledOnce;
+mockHttp.verify.get('/v1/cities', query: {'page': 2}).called(2);
+mockHttp.verify.delete('/v1/session').never;
+mockHttp.requests;  // raw recording of everything sent
 ```
 
 ## Notes

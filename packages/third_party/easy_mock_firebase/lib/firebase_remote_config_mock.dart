@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Config Dart, only the native side is faked). Drive flag values with
 /// [setRemoteValues] before launching the app, or [pushUpdate] to emit an
 /// `onConfigUpdated` event.
-final mockRemoteConfig = MockRemoteConfig._();
+final mockFirebaseRemoteConfig = MockRemoteConfig._();
 
 class MockRemoteConfig {
   MockRemoteConfig._();

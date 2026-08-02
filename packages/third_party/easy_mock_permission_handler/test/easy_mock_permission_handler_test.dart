@@ -8,7 +8,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   const channel = MethodChannel('flutter.baseflow.com/permissions/methods');
 
-  setUp(mockPermission.install);
+  setUp(mockPermissionHandler.install);
 
   test('camera and notification default to granted', () async {
     expect(await channel.invokeMethod('checkPermissionStatus', 1), 1);
@@ -20,7 +20,7 @@ void main() {
   });
 
   test('camera.deny()', () async {
-    mockPermission.camera.deny();
+    mockPermissionHandler.camera.deny();
 
     expect(await channel.invokeMethod('checkPermissionStatus', 1), 0);
     expect(await channel.invokeMethod('requestPermissions', [1]), {
@@ -30,7 +30,7 @@ void main() {
   });
 
   test('notification.permanentlyDeny()', () async {
-    mockPermission.notification.permanentlyDeny();
+    mockPermissionHandler.notification.permanentlyDeny();
 
     expect(await channel.invokeMethod('checkPermissionStatus', 17), 4);
   });
@@ -38,17 +38,17 @@ void main() {
   test('service status', () async {
     expect(await channel.invokeMethod('checkServiceStatus', 1), 1);
 
-    mockPermission.serviceDisabled();
+    mockPermissionHandler.serviceDisabled();
     expect(await channel.invokeMethod('checkServiceStatus', 1), 0);
 
-    mockPermission.serviceNotApplicable();
+    mockPermissionHandler.serviceNotApplicable();
     expect(await channel.invokeMethod('checkServiceStatus', 1), 2);
   });
 
   test('open app settings', () async {
     expect(await channel.invokeMethod('openAppSettings'), true);
 
-    mockPermission.doNotOpenAppSetting();
+    mockPermissionHandler.doNotOpenAppSetting();
     expect(await channel.invokeMethod('openAppSettings'), false);
   });
 
@@ -58,7 +58,7 @@ void main() {
       false,
     );
 
-    mockPermission.showRequestPermissionRationale();
+    mockPermissionHandler.showRequestPermissionRationale();
     expect(
       await channel.invokeMethod('shouldShowRequestPermissionRationale', 1),
       true,

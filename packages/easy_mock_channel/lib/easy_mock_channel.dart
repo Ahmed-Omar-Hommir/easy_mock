@@ -2,24 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stack_trace/stack_trace.dart';
 
-/// Fails the current test if the app sends a message on a platform channel that
-/// has no registered mock, instead of hanging on the real platform or silently
-/// returning null. The failure names the channel, the method, and the call site
-/// that triggered it.
-///
-/// The guard is strict: any channel without a handler fails the test — mock the
-/// channels your test touches (`mockChannel(...)`, or the `easy_mock_*`
-/// installers). A channel stubbed with [mockChannel] (or any other registered
-/// handler) is delegated to that mock as usual.
-///
-/// Install it once per test, alongside your other mock installers:
-///
-/// ```dart
-/// installUnmockedChannelGuard();
-/// ```
-///
-/// The guard removes itself on teardown.
-void installUnmockedChannelGuard() {
+void _installUnmockedChannelGuard() {
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
   final hits = <String, String>{};
@@ -88,25 +71,54 @@ String _callSite(Chain chain, {int max = 6}) {
   return lines.isEmpty ? '      origin unknown' : lines.join('\n');
 }
 
-/// Stubs a platform [MethodChannel] in tests with a fluent `when` API and
-/// records every call for verification. The mock handler is installed
-/// immediately and removed automatically on test teardown.
-///
-/// ```dart
-/// final channel = mockChannel('flutter.baseflow.com/permissions/methods');
-/// channel.when(method: 'checkPermissionStatus', arguments: 1, returns: 0);
-/// channel.when(method: 'requestPermissions', returns: {1: 0});
-///
-/// expect(channel.verify(method: 'requestPermissions').length, 1);
-/// ```
-///
-/// Pass [codec] for channels that don't use the default [StandardMethodCodec]
-/// (e.g. `flutter/platform` uses [JSONMethodCodec]) — it must match the real
-/// channel's codec or messages won't decode.
-MockMethodChannel mockChannel(
-  String name, {
-  MethodCodec codec = const StandardMethodCodec(),
-}) => MockMethodChannel(name, codec: codec);
+/// The channel mock. Invoke it as `mockChannel('name')` to stub a specific
+/// platform channel, and `mockChannel.install()` to guard against unmocked
+/// channels.
+final mockChannel = MockChannel._();
+
+/// Entry point for channel mocking — reached through the [mockChannel]
+/// singleton.
+class MockChannel {
+  MockChannel._();
+
+  /// Stubs a platform [MethodChannel] in tests with a fluent `when` API and
+  /// records every call for verification. The mock handler is installed
+  /// immediately and removed automatically on test teardown.
+  ///
+  /// ```dart
+  /// final channel = mockChannel('flutter.baseflow.com/permissions/methods');
+  /// channel.when(method: 'checkPermissionStatus', arguments: 1, returns: 0);
+  /// channel.when(method: 'requestPermissions', returns: {1: 0});
+  ///
+  /// expect(channel.verify(method: 'requestPermissions').length, 1);
+  /// ```
+  ///
+  /// Pass [codec] for channels that don't use the default [StandardMethodCodec]
+  /// (e.g. `flutter/platform` uses [JSONMethodCodec]) — it must match the real
+  /// channel's codec or messages won't decode.
+  MockMethodChannel call(
+    String name, {
+    MethodCodec codec = const StandardMethodCodec(),
+  }) => MockMethodChannel(name, codec: codec);
+
+  /// Fails the current test if the app sends a message on a platform channel
+  /// that has no registered mock, instead of hanging on the real platform or
+  /// silently returning null. The failure names the channel, the method, and
+  /// the call site that triggered it.
+  ///
+  /// The guard is strict: any channel without a handler fails the test — mock
+  /// the channels your test touches (`mockChannel('name')`, or the `easy_mock_*`
+  /// installers). A channel stubbed with [call] (or any other registered
+  /// handler) is delegated to that mock as usual. Install it once per test,
+  /// alongside your other mock installers:
+  ///
+  /// ```dart
+  /// mockChannel.install();
+  /// ```
+  ///
+  /// The guard removes itself on teardown.
+  void install() => _installUnmockedChannelGuard();
+}
 
 const Object _anyArguments = Object();
 

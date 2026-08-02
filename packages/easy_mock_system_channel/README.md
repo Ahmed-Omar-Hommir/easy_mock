@@ -16,13 +16,13 @@ import 'package:easy_mock_system_channel/easy_mock_system_channel.dart';
 import 'package:flutter/services.dart';
 
 testWidgets('haptics + clipboard', (tester) async {
-  mockSystemChannels.install();
+  mockSystemChannel.install();
 
   // ... drive code that calls HapticFeedback.vibrate() ...
-  expect(mockSystemChannels.platform.verify(method: 'HapticFeedback.vibrate').length, 1);
+  expect(mockSystemChannel.platform.verify(method: 'HapticFeedback.vibrate').length, 1);
 
   // Override a return value:
-  mockSystemChannels.platform.when(
+  mockSystemChannel.platform.when(
     method: 'Clipboard.getData',
     returns: {'text': 'hello'},
   );
@@ -33,7 +33,7 @@ testWidgets('haptics + clipboard', (tester) async {
 - **`install({bool includeTextInput = false})`** installs the mocks immediately
   and removes them on teardown. Wire it into your test harness alongside the
   other `easy_mock_*` installers.
-- **`mockSystemChannels.platform`** / `.navigation` / `.mouseCursor` /
+- **`mockSystemChannel.platform`** / `.navigation` / `.mouseCursor` /
   `.contextMenu` / `.restoration` — each is a `MockMethodChannel`, so use
   `.when(...)` to override and `.verify(...)` to assert. Reach any other channel
   by name with **`channel('flutter/status_bar')`**.

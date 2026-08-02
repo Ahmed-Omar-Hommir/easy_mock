@@ -52,16 +52,16 @@ const _specs = <_ChannelSpec>[
 /// Default mocks for Flutter's [SystemChannels]. Install once per test:
 ///
 /// ```dart
-/// mockSystemChannels.install();
+/// mockSystemChannel.install();
 /// ```
-final mockSystemChannels = MockSystemChannels._();
+final mockSystemChannel = MockSystemChannel._();
 
 /// Installs a [MockMethodChannel] for every SystemChannels method channel so
 /// calls like `HapticFeedback.vibrate()` are answered (default: `null`) and
 /// recorded instead of reaching the real platform. Override or assert on any of
 /// them through [channel] or the named getters.
-class MockSystemChannels {
-  MockSystemChannels._();
+class MockSystemChannel {
+  MockSystemChannel._();
 
   final Map<String, MockMethodChannel> _channels = {};
 
@@ -72,7 +72,7 @@ class MockSystemChannels {
   /// by the framework's `TestTextInput`, which patrol registers only during
   /// `enterText` and unregisters afterwards. A null reply on it is harmless, so
   /// [_relaxTextInput] keeps a strict unmocked-channel guard from failing on the
-  /// windows where it has no handler (see [installUnmockedChannelGuard]). Install
+  /// windows where it has no handler (see [MockChannel.install]). Install
   /// this AFTER the guard so it can wrap it.
   void install() {
     _channels.clear();
@@ -104,7 +104,7 @@ class MockSystemChannels {
     final mock = _channels[name];
     if (mock == null) {
       throw StateError(
-        'No SystemChannels mock for "$name". Call mockSystemChannels.install() '
+        'No SystemChannels mock for "$name". Call mockSystemChannel.install() '
         'first. (flutter/textinput is handled by TestTextInput, not mocked here.)',
       );
     }

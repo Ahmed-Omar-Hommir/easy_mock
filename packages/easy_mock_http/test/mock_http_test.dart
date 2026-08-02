@@ -4,7 +4,7 @@ import 'package:easy_mock_http/easy_mock_http.dart';
 import 'examples.dart';
 
 void main() {
-  setUp(setUpMockHttp);
+  setUp(mockHttp.install);
 
   group('mockHttp', () {
     final cards = [
@@ -15,31 +15,31 @@ void main() {
 
     test('getProductsV1 returns the stubbed body', () async {
       // Arrange
-      http.when.get(cardsUrl, response: cards);
+      mockHttp.when.get(cardsUrl, response: cards);
 
       // Act
       final response = await getProductsV1();
 
       // Assert
-      http.verify.get(cardsUrl).called(1);
+      mockHttp.verify.get(cardsUrl).called(1);
       expect(response, cards);
     });
 
     test('getProductsV2 returns the stubbed body', () async {
       // Arrange
-      http.when.get(cardsUrl, response: cards);
+      mockHttp.when.get(cardsUrl, response: cards);
 
       // Act
       final response = await getProductsV2();
 
       // Assert
-      http.verify.get(cardsUrl).called(1);
+      mockHttp.verify.get(cardsUrl).called(1);
       expect(response, cards);
     });
 
     test('matches a stub by request header', () async {
       // Arrange
-      http.when.get(
+      mockHttp.when.get(
         cardsUrl,
         headers: {'Authorization': 'Bearer token-123'},
         response: cards,
@@ -49,7 +49,7 @@ void main() {
       final response = await getProductsWithAuth('token-123');
 
       // Assert
-      http.verify
+      mockHttp.verify
           .get(cardsUrl, headers: {'Authorization': 'Bearer token-123'})
           .calledOnce;
       expect(response, cards);
@@ -60,19 +60,19 @@ void main() {
       final page2 = [
         {'id': 4, 'name': 'Madar', 'quantity': 1},
       ];
-      http.when.get(cardsUrl, query: {'page': 2}, response: page2);
+      mockHttp.when.get(cardsUrl, query: {'page': 2}, response: page2);
 
       // Act
       final response = await getProductsPage(2);
 
       // Assert
-      http.verify.get(cardsUrl, query: {'page': 2}).calledOnce;
+      mockHttp.verify.get(cardsUrl, query: {'page': 2}).calledOnce;
       expect(response, page2);
     });
 
     test('applies the stubbed response delay', () async {
       // Arrange
-      http.when.get(
+      mockHttp.when.get(
         pingUrl,
         response: {'pong': true},
         delay: const Duration(milliseconds: 300),
@@ -92,7 +92,7 @@ void main() {
 
     test('propagates an injected network failure', () async {
       // Arrange
-      http.when.get(cardsUrl, error: Exception('connection refused'));
+      mockHttp.when.get(cardsUrl, error: Exception('connection refused'));
 
       // Act
       final request = getProductsV1();

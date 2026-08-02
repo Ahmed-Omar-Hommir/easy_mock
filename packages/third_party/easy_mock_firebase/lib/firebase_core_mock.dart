@@ -1,13 +1,21 @@
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:firebase_core_platform_interface/test.dart';
 
-/// Drop-in for `setupFirebaseCoreMocks()` that also seeds the plugin constants
-/// some Firebase plugins read (and assert on) *before* their platform delegate
-/// is built — notably Crashlytics' `isCrashlyticsCollectionEnabled`, which the
-/// official mock leaves empty. Call it before `Firebase.initializeApp()` in
-/// place of `setupFirebaseCoreMocks()` when the boot touches Crashlytics.
-void setUpFirebaseCoreMock() {
-  TestFirebaseCoreHostApi.setUp(_SeededFirebaseCore());
+/// Firebase core mock. Call [MockFirebaseCore.install] before
+/// `Firebase.initializeApp()`.
+final mockFirebaseCore = MockFirebaseCore._();
+
+class MockFirebaseCore {
+  MockFirebaseCore._();
+
+  /// Drop-in for `setupFirebaseCoreMocks()` that also seeds the plugin constants
+  /// some Firebase plugins read (and assert on) *before* their platform delegate
+  /// is built — notably Crashlytics' `isCrashlyticsCollectionEnabled`, which the
+  /// official mock leaves empty. Call it before `Firebase.initializeApp()` in
+  /// place of `setupFirebaseCoreMocks()` when the boot touches Crashlytics.
+  void install() {
+    TestFirebaseCoreHostApi.setUp(_SeededFirebaseCore());
+  }
 }
 
 class _SeededFirebaseCore implements TestFirebaseCoreHostApi {

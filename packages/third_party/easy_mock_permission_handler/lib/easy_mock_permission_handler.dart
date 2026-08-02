@@ -27,7 +27,7 @@ const _notificationPermission = 17;
 /// mockPermissionHandler.notification.grant();
 /// mockPermissionHandler.serviceDisabled();
 /// ```
-final mockPermission = MockPermissionHandler._();
+final mockPermissionHandler = MockPermissionHandler._();
 
 /// Drives a faked permission_handler channel. Defaults: camera and notification
 /// granted, service enabled, app settings openable, no rationale.
