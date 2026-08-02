@@ -14,7 +14,7 @@ readable API and per-test reset.
 ```dart
 import 'package:easy_mock_package_info/easy_mock_package_info.dart';
 
-mockPackageInfo.install();                          // harness usually does this
+mockPackageInfo.init();                          // harness usually does this
 mockPackageInfo.set(version: '2.3.4', buildNumber: '42');
 
 // app code: (await PackageInfo.fromPlatform()).version == '2.3.4'

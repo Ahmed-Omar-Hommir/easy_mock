@@ -10,7 +10,7 @@ A readable test mock for
 ```dart
 import 'package:easy_mock_device_info/easy_mock_device_info.dart';
 
-mockDeviceInfo.install();                                   // harness usually does this
+mockDeviceInfo.init();                                   // harness usually does this
 mockDeviceInfo.set(name: 'Pixel 7', manufacturer: 'Google', model: 'Pixel 7', id: 'd1');
 ```
 

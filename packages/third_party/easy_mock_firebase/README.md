@@ -7,7 +7,7 @@ installed inside a test (they register their own teardown):
 import 'package:easy_mock_firebase/easy_mock_firebase.dart';
 ```
 
-## `mockFirebaseCore.install()`
+## `mockFirebaseCore.init()`
 
 A drop-in for the official `setupFirebaseCoreMocks()` that *also* seeds the
 plugin constants some Firebase plugins read before their platform delegate is
@@ -18,13 +18,13 @@ throws an assertion error a platform fake can't intercept. Use this instead of
 touches Crashlytics:
 
 ```dart
-mockFirebaseCore.install();          // in place of setupFirebaseCoreMocks()
+mockFirebaseCore.init();          // in place of setupFirebaseCoreMocks()
 await Firebase.initializeApp();
-mockFirebaseCrashlytics.install();
-mockFirebaseAppCheck.install();
+mockFirebaseCrashlytics.init();
+mockFirebaseAppCheck.init();
 ```
 
-## `mockFirebaseAppCheck.install()`
+## `mockFirebaseAppCheck.init()`
 
 Stubs the Firebase App Check **pigeon** channel (`FirebaseAppCheckHostApi`),
 keeping the real `MethodChannelFirebaseAppCheck` Dart. Without it, `activate()`
@@ -34,18 +34,18 @@ the fake test clock hangs (same failure as Firebase Performance). `activate` /
 `registerTokenListener` replies null, which the plugin swallows, so no live
 token EventChannel is opened.
 
-## `mockFirebaseCrashlytics.install()`
+## `mockFirebaseCrashlytics.init()`
 
 Stubs the `plugins.flutter.io/firebase_crashlytics` MethodChannel via
 `easy_mock_channel`, so the real `MethodChannelFirebaseCrashlytics` Dart runs but
 `log` / `recordError` / … never reach the native side. Needs no `Firebase.app()`,
 so it installs with the other mocks before the boot. Still requires
-`mockFirebaseCore.install()` (above) — the platform interface asserts
+`mockFirebaseCore.init()` (above) — the platform interface asserts
 `isCrashlyticsCollectionEnabled` in `instanceFor`, before any channel call. The
 boot itself only tears off `recordFlutterFatalError`, so it never touches
 Crashlytics; this covers the case where an error is actually routed to it.
 
-## `mockFirebasePerformance.install()`
+## `mockFirebasePerformance.init()`
 
 Stubs the Firebase Performance **pigeon** channel (`HttpMetric` /`Trace`
 start/stop). Without it, the Dio performance interceptor's `await metric.start()`
@@ -53,7 +53,7 @@ is routed to the real platform messenger and only completes on the real event
 loop — forcing tests to use `runAsync`. With it, those calls resolve on the fake
 clock, so the whole HTTP flow settles under `pump` / `pumpAndSettle`.
 
-## `mockFirebaseRemoteConfig.install()`
+## `mockFirebaseRemoteConfig.init()`
 
 Installs an in-memory `FirebaseRemoteConfigPlatform`, keeping the real
 `firebase_remote_config` Dart logic. Drive values through `mockFirebaseRemoteConfig`:
@@ -66,7 +66,7 @@ mockFirebaseRemoteConfig.pushUpdate({'show_wallet': false});     // emit an onCo
 The app must still run its own Remote Config init (`setDefaults` /
 `fetchAndActivate`) so the active cache the generated getters read is populated.
 
-## `mockFirebaseMessaging.install()`
+## `mockFirebaseMessaging.init()`
 
 Stubs the `plugins.flutter.io/firebase_messaging` **MethodChannel** (a plain
 channel, unlike Performance/Remote Config which are pigeon) via
@@ -75,7 +75,7 @@ default-happy replies — permission authorized, a fake FCM/APNs token, no initi
 message — and lets you tweak them:
 
 ```dart
-mockFirebaseMessaging.install();
+mockFirebaseMessaging.init();
 
 mockFirebaseMessaging.deny();                 // requestPermission → denied
 mockFirebaseMessaging.token('tok-123');       // getToken() → 'tok-123'

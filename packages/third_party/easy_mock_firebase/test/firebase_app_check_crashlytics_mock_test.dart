@@ -8,10 +8,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   setUp(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    mockFirebaseCore.install();
+    mockFirebaseCore.init();
     await Firebase.initializeApp();
-    mockFirebaseAppCheck.install();
-    mockFirebaseCrashlytics.install();
+    mockFirebaseAppCheck.init();
+    mockFirebaseCrashlytics.init();
   });
 
   group('FirebaseAppCheck', () {

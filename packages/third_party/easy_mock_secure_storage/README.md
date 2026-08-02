@@ -12,7 +12,7 @@ method codes directly.
 ```dart
 import 'package:easy_mock_secure_storage/easy_mock_secure_storage.dart';
 
-mockSecureStorage.install();                       // harness usually does this
+mockSecureStorage.init();                       // harness usually does this
 
 // Seed what the app will read:
 mockSecureStorage.seed({'unique_device_id': 'abc'});

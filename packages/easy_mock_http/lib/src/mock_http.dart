@@ -26,7 +26,7 @@ part of '../easy_mock_http.dart';
 // [Matcher] — [any] for "don't care", or a flutter_test matcher like
 // `greaterThan(3)` / `contains('x')` for finer checks.
 
-/// The HTTP mock. Call [MockHttp.install] to route `dart:io` traffic through
+/// The HTTP mock. Call [MockHttp.init] to route `dart:io` traffic through
 /// it, then stub with [MockHttp.when] / [MockHttp.expect] and assert with
 /// [MockHttp.verify].
 final mockHttp = MockHttp._();
@@ -45,7 +45,7 @@ class MockHttp {
   /// Installs this mock as `HttpOverrides.global`, resetting stubs and recorded
   /// requests, and removes it on teardown. Build transport clients (Dio,
   /// `http.Client`, repositories) AFTER this call so they pick up the override.
-  void install() {
+  void init() {
     _stubs.clear();
     overrides.requests.clear();
     HttpOverrides.global = overrides;

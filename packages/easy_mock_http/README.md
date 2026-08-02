@@ -19,7 +19,7 @@ import 'package:easy_mock_http/easy_mock_http.dart';
 
 test('ping replies pong', () async {
   // Arrange
-  mockHttp.install();
+  mockHttp.init();
   mockHttp.when.get(
     'https://www.example.com/api/ping',
     response: {'pong': true},

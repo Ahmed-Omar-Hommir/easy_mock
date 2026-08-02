@@ -8,7 +8,7 @@ void main() {
   setUp(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     setupFirebaseCoreMocks();
-    mockFirebaseMessaging.install();
+    mockFirebaseMessaging.init();
     await Firebase.initializeApp();
   });
 

@@ -11,7 +11,7 @@
 /// ```dart
 /// test('ping replies pong', () async {
 ///   // Arrange
-///   mockHttp.install();
+///   mockHttp.init();
 ///   mockHttp.when.get(
 ///     'https://www.example.com/api/ping',
 ///     response: {'pong': true},

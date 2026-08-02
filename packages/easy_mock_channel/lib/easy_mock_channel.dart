@@ -72,7 +72,7 @@ String _callSite(Chain chain, {int max = 6}) {
 }
 
 /// The channel mock. Invoke it as `mockChannel('name')` to stub a specific
-/// platform channel, and `mockChannel.install()` to guard against unmocked
+/// platform channel, and `mockChannel.init()` to guard against unmocked
 /// channels.
 final mockChannel = MockChannel._();
 
@@ -113,11 +113,11 @@ class MockChannel {
   /// alongside your other mock installers:
   ///
   /// ```dart
-  /// mockChannel.install();
+  /// mockChannel.init();
   /// ```
   ///
   /// The guard removes itself on teardown.
-  void install() => _installUnmockedChannelGuard();
+  void init() => _installUnmockedChannelGuard();
 }
 
 const Object _anyArguments = Object();

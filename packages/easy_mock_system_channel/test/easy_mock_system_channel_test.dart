@@ -6,7 +6,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('records a HapticFeedback call and returns without error', () async {
-    mockSystemChannel.install();
+    mockSystemChannel.init();
 
     await HapticFeedback.vibrate();
 
@@ -19,13 +19,13 @@ void main() {
   });
 
   test('Clipboard.hasStrings defaults to false', () async {
-    mockSystemChannel.install();
+    mockSystemChannel.init();
 
     expect(await Clipboard.hasStrings(), isFalse);
   });
 
   test('a platform method can be overridden (JSONMethodCodec path)', () async {
-    mockSystemChannel.install();
+    mockSystemChannel.init();
     mockSystemChannel.platform.when(
       method: 'Clipboard.getData',
       returns: {'text': 'hello'},
@@ -37,7 +37,7 @@ void main() {
   });
 
   test('records SystemChrome calls with their arguments', () async {
-    mockSystemChannel.install();
+    mockSystemChannel.init();
 
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -48,7 +48,7 @@ void main() {
   });
 
   test('a StandardMethodCodec channel returns null by default', () async {
-    mockSystemChannel.install();
+    mockSystemChannel.init();
 
     const restoration = MethodChannel('flutter/restoration');
     expect(await restoration.invokeMethod<Object?>('get'), isNull);
@@ -56,7 +56,7 @@ void main() {
   });
 
   test('flutter/textinput is not exposed as a mock channel', () {
-    mockSystemChannel.install();
+    mockSystemChannel.init();
 
     expect(
       () => mockSystemChannel.channel('flutter/textinput'),
@@ -67,8 +67,8 @@ void main() {
   test(
     'a strict guard is not tripped by an unhandled flutter/textinput call',
     () async {
-      mockChannel.install();
-      mockSystemChannel.install();
+      mockChannel.init();
+      mockSystemChannel.init();
       // Simulate patrol having unregistered the framework's TestTextInput.
       TestWidgetsFlutterBinding.instance.testTextInput.unregister();
 
@@ -88,7 +88,7 @@ void main() {
   );
 
   test('channel(name) reaches any installed channel', () async {
-    mockSystemChannel.install();
+    mockSystemChannel.init();
 
     expect(
       mockSystemChannel.channel('flutter/platform'),

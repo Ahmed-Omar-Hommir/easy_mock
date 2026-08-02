@@ -54,7 +54,7 @@ class MockPermissionHandler {
 
   /// Installs the channel mock and resets every scenario to its default. The
   /// harness calls this once per test.
-  void install() {
+  void init() {
     _statuses
       ..clear()
       ..[_cameraPermission] = _statusGranted

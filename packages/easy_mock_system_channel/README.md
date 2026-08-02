@@ -16,7 +16,7 @@ import 'package:easy_mock_system_channel/easy_mock_system_channel.dart';
 import 'package:flutter/services.dart';
 
 testWidgets('haptics + clipboard', (tester) async {
-  mockSystemChannel.install();
+  mockSystemChannel.init();
 
   // ... drive code that calls HapticFeedback.vibrate() ...
   expect(mockSystemChannel.platform.verify(method: 'HapticFeedback.vibrate').length, 1);

@@ -1,6 +1,6 @@
 # easy_mock_io
 
-In-memory `dart:io` for Flutter tests. `MockMemoryIO.install()` replaces
+In-memory `dart:io` for Flutter tests. `MockMemoryIO.init()` replaces
 `IOOverrides.global` with a [`MemoryFileSystem`], so every `File` / `Directory`
 your code under test touches runs in memory instead of hitting the real disk —
 no temp files to clean up, and tests stay isolated from each other.
@@ -10,7 +10,7 @@ no temp files to clean up, and tests stay isolated from each other.
 ```dart
 import 'package:easy_mock_io/easy_mock_io.dart';
 
-setUp(() => MockMemoryIO.install());
+setUp(() => MockMemoryIO.init());
 tearDown(() => IOOverrides.global = null);
 
 test('writes go to memory, not disk', () {
@@ -22,7 +22,7 @@ test('writes go to memory, not disk', () {
 });
 ```
 
-- **`MockMemoryIO.install([MemoryFileSystem? fs])`** installs the override. Pass
+- **`MockMemoryIO.init([MemoryFileSystem? fs])`** installs the override. Pass
   a pre-seeded filesystem to start with files already present; omit it for an
   empty one.
 - **File locks are no-ops.** `lock` / `unlock` (sync and async) return

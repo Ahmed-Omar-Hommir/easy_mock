@@ -8,7 +8,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   const channel = MethodChannel('flutter.baseflow.com/permissions/methods');
 
-  setUp(mockPermissionHandler.install);
+  setUp(mockPermissionHandler.init);
 
   test('camera and notification default to granted', () async {
     expect(await channel.invokeMethod('checkPermissionStatus', 1), 1);

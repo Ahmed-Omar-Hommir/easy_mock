@@ -9,7 +9,7 @@ void main() {
   Future<Map<dynamic, dynamic>?> getDeviceInfo() =>
       channel.invokeMapMethod<dynamic, dynamic>('getDeviceInfo');
 
-  setUp(mockDeviceInfo.install);
+  setUp(mockDeviceInfo.init);
 
   test('a complete default map', () async {
     final info = (await getDeviceInfo())!;

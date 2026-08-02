@@ -11,11 +11,11 @@ class MockFirebaseMessaging {
   MockMethodChannel? _channel;
   MockMethodChannel get _c =>
       _channel ??
-      (throw StateError('call mockFirebaseMessaging.install() first'));
+      (throw StateError('call mockFirebaseMessaging.init() first'));
 
   MockMethodChannel get channel => _c;
 
-  void install() {
+  void init() {
     _channel = mockChannel(channelName);
     grant();
     token('fake-fcm-token');

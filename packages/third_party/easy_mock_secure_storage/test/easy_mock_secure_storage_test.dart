@@ -11,7 +11,7 @@ void main() {
   Future<Object?> invoke(String method, [Map<String, Object?>? args]) =>
       channel.invokeMethod<Object?>(method, args);
 
-  setUp(mockSecureStorage.install);
+  setUp(mockSecureStorage.init);
 
   test('starts empty', () async {
     expect(await invoke('read', {'key': 'k'}), isNull);

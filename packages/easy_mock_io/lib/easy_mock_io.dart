@@ -22,7 +22,7 @@ class MemoryIOConfig {
 class MockMemoryIO {
   const MockMemoryIO._();
 
-  void install([
+  void init([
     MemoryFileSystem? memoryFile,
     MemoryIOConfig config = const MemoryIOConfig(),
   ]) {

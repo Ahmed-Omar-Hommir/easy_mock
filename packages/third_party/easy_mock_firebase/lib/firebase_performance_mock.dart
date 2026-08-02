@@ -14,7 +14,7 @@ final mockFirebasePerformance = MockFirebasePerformance._();
 class MockFirebasePerformance {
   MockFirebasePerformance._();
 
-  void install() {
+  void init() {
     const codec = StandardMessageCodec();
     const prefix =
         'dev.flutter.pigeon.firebase_performance_platform_interface.'

@@ -7,7 +7,7 @@ void main() {
   tearDown(() => IOOverrides.global = null);
 
   test('routes dart:io File through the in-memory filesystem', () {
-    mockMemoryIO.install();
+    mockMemoryIO.init();
 
     File('/notes/todo.txt')
       ..createSync(recursive: true)
@@ -20,7 +20,7 @@ void main() {
   });
 
   test('pre-creates /app_root', () {
-    mockMemoryIO.install();
+    mockMemoryIO.init();
 
     expect(Directory('/app_root').existsSync(), isTrue);
   });
@@ -31,13 +31,13 @@ void main() {
       ..createSync(recursive: true)
       ..writeAsStringSync('from seed');
 
-    mockMemoryIO.install(fs);
+    mockMemoryIO.init(fs);
 
     expect(File('/seed.txt').readAsStringSync(), 'from seed');
   });
 
   test('file locks are no-ops instead of throwing or deadlocking', () async {
-    mockMemoryIO.install();
+    mockMemoryIO.init();
 
     final file = File('/data.bin')..writeAsBytesSync([1, 2, 3]);
     final raf = file.openSync(mode: FileMode.append);

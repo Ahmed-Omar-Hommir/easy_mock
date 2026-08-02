@@ -12,9 +12,9 @@ class MockFirebaseCrashlytics {
 
   MockMethodChannel get channel =>
       _channel ??
-      (throw StateError('call mockFirebaseCrashlytics.install() first'));
+      (throw StateError('call mockFirebaseCrashlytics.init() first'));
 
-  void install() {
+  void init() {
     _channel = mockChannel(channelName)
       ..when(
         method: 'Crashlytics#checkForUnsentReports',

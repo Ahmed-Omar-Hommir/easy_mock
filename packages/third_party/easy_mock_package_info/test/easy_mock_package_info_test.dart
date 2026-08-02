@@ -5,7 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(mockPackageInfo.install);
+  setUp(mockPackageInfo.init);
 
   test('defaults', () async {
     final info = await PackageInfo.fromPlatform();

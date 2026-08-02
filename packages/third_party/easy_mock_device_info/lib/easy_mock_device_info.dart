@@ -104,7 +104,7 @@ class MockDeviceInfo {
 
   /// Installs the channel mock and resets to the default info. The harness calls
   /// this once per test.
-  void install() {
+  void init() {
     _data = _defaults;
     _delay = null;
     _throws = null;

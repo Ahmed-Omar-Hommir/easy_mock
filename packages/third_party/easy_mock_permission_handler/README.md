@@ -14,7 +14,7 @@ back. Scoped to **camera and notification** for now.
 import 'package:easy_mock_permission_handler/easy_mock_permission_handler.dart';
 
 testWidgets('blocks the camera step when denied', (tester) async {
-  mockPermissionHandler.install();          // harness usually does this
+  mockPermissionHandler.init();          // harness usually does this
   mockPermissionHandler.camera.deny();
 
   // ... drive the code under test that calls Permission.camera.request() ...

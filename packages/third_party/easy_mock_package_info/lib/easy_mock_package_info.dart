@@ -22,7 +22,7 @@ class MockPackageInfo {
   String _buildNumber = '1';
 
   /// Resets [PackageInfo] to the defaults. The harness calls this once per test.
-  void install() {
+  void init() {
     _appName = 'epay';
     _packageName = 'ly.anis.epay';
     _version = '1.0.0';

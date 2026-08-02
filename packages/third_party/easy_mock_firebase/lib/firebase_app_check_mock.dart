@@ -10,7 +10,7 @@ class MockFirebaseAppCheck {
       'dev.flutter.pigeon.firebase_app_check_platform_interface'
       '.FirebaseAppCheckHostApi.';
 
-  void install() {
+  void init() {
     _stub('activate', null);
     _stub('getToken', 'fake-app-check-token');
     _stub('getLimitedUseAppCheckToken', 'fake-app-check-token');

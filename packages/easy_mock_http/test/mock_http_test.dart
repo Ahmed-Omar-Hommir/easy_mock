@@ -4,7 +4,7 @@ import 'package:easy_mock_http/easy_mock_http.dart';
 import 'examples.dart';
 
 void main() {
-  setUp(mockHttp.install);
+  setUp(mockHttp.init);
 
   group('mockHttp', () {
     final cards = [

@@ -25,7 +25,7 @@ any channel call.
 ```dart
 import 'package:easy_mock_local_notifications/easy_mock_local_notifications.dart';
 
-setUp(() => mockLocalNotifications.install());
+setUp(() => mockLocalNotifications.init());
 ```
 
 `install()` registers the **real** `AndroidFlutterLocalNotificationsPlugin` (via

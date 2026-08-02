@@ -28,7 +28,7 @@ class MockRemoteConfig {
     _streamController!.add(RemoteConfigUpdate(value.keys.toSet()));
   }
 
-  void install() {
+  void init() {
     _streamController = StreamController<RemoteConfigUpdate>.broadcast();
     addTearDown(() {
       _value = {};

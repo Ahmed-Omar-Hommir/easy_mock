@@ -25,7 +25,7 @@ class MockSecureStorage {
 
   /// Wires the channel mock and clears the store. The harness calls this once
   /// per test.
-  void install() {
+  void init() {
     _store.clear();
     _delay = null;
     const channel = MethodChannel(_channelName);

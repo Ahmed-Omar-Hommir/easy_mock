@@ -52,7 +52,7 @@ const _specs = <_ChannelSpec>[
 /// Default mocks for Flutter's [SystemChannels]. Install once per test:
 ///
 /// ```dart
-/// mockSystemChannel.install();
+/// mockSystemChannel.init();
 /// ```
 final mockSystemChannel = MockSystemChannel._();
 
@@ -72,9 +72,9 @@ class MockSystemChannel {
   /// by the framework's `TestTextInput`, which patrol registers only during
   /// `enterText` and unregisters afterwards. A null reply on it is harmless, so
   /// [_relaxTextInput] keeps a strict unmocked-channel guard from failing on the
-  /// windows where it has no handler (see [MockChannel.install]). Install
+  /// windows where it has no handler (see [MockChannel.init]). Install
   /// this AFTER the guard so it can wrap it.
-  void install() {
+  void init() {
     _channels.clear();
     for (final spec in _specs) {
       final mock = mockChannel(spec.name, codec: spec.codec);
@@ -104,7 +104,7 @@ class MockSystemChannel {
     final mock = _channels[name];
     if (mock == null) {
       throw StateError(
-        'No SystemChannels mock for "$name". Call mockSystemChannel.install() '
+        'No SystemChannels mock for "$name". Call mockSystemChannel.init() '
         'first. (flutter/textinput is handled by TestTextInput, not mocked here.)',
       );
     }

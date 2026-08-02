@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   setUp(() {
     TestWidgetsFlutterBinding.ensureInitialized();
-    mockLocalNotifications.install();
+    mockLocalNotifications.init();
   });
 
   test('initialize() runs the real impl against the mocked channel', () async {

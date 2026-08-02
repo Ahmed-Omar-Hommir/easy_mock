@@ -13,9 +13,9 @@ class MockLocalNotifications {
 
   MockMethodChannel get channel =>
       _channel ??
-      (throw StateError('call mockLocalNotifications.install() first'));
+      (throw StateError('call mockLocalNotifications.init() first'));
 
-  void install() {
+  void init() {
     AndroidFlutterLocalNotificationsPlugin.registerWith();
 
     _channel = mockChannel(channelName)
