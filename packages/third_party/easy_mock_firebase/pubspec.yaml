@@ -29,7 +29,3 @@ dev_dependencies:
   firebase_messaging: 16.5.0
   firebase_crashlytics: 5.2.7
   firebase_app_check: 0.4.6
-
-dependency_overrides:
-  easy_mock_channel:
-    path: ../../easy_mock_channel

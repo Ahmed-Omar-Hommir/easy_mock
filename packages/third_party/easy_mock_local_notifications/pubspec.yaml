@@ -23,7 +23,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
-dependency_overrides:
-  easy_mock_channel:
-    path: ../../easy_mock_channel
