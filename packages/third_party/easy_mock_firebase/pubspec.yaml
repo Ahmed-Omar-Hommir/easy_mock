@@ -1,14 +1,10 @@
 name: easy_mock_firebase
 description: >-
-  Firebase test fakes for Flutter widget tests. mockFirebasePerformance.init()
-  stubs the Firebase Performance pigeon channel so HttpMetric calls settle under
-  the fake clock; mockRemoteConfig.init() installs an in-memory
-  FirebaseRemoteConfigPlatform (setRemoteValues / pushUpdate) while keeping the
-  real Remote Config Dart logic;
-  mockFirebaseMessaging.init() / mockFirebaseAppCheck.init() /
-  mockFirebaseCrashlytics.init() stub the respective MethodChannel / pigeon
-  channels so those plugins run their real Dart without reaching native (App
-  Check no longer hangs the fake clock, Crashlytics never hits the channel).
+  Firebase test fakes for Flutter widget tests. Stubs the Performance, Messaging,
+  App Check and Crashlytics platform channels and installs an in-memory Remote
+  Config (setRemoteValues / pushUpdate), so each plugin runs its real Dart
+  without reaching native. HttpMetric calls settle under the fake clock and App
+  Check no longer hangs it.
 version: 0.1.0
 homepage: https://github.com/Ahmed-Omar-Hommir/easy_mock
 repository: https://github.com/Ahmed-Omar-Hommir/easy_mock
