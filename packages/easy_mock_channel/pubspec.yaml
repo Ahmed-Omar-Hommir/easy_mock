@@ -6,7 +6,9 @@ description: >-
   guard that fails a test when the app calls an unmocked platform channel,
   naming the channel, method, and call site instead of hanging.
 version: 0.1.0
-publish_to: none
+homepage: https://github.com/Ahmed-Omar-Hommir/easy_mock
+repository: https://github.com/Ahmed-Omar-Hommir/easy_mock
+issue_tracker: https://github.com/Ahmed-Omar-Hommir/easy_mock/issues
 
 environment:
   sdk: ^3.9.0

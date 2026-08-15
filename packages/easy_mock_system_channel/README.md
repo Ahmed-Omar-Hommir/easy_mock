@@ -1,7 +1,7 @@
 # easy_mock_system_channel
 
 Default test mocks for Flutter's [`SystemChannels`](https://api.flutter.dev/flutter/services/SystemChannels-class.html),
-built on `easy_mock_channel`. One `install()` and every framework method channel
+built on `easy_mock_channel`. One `init()` and every framework method channel
 (`flutter/platform`, `flutter/navigation`, `flutter/mousecursor`, …) answers with
 a sensible default — each method returns `null` and is recorded — so app code
 that calls `HapticFeedback.vibrate()`, `SystemChrome.setPreferredOrientations()`,
@@ -30,9 +30,9 @@ testWidgets('haptics + clipboard', (tester) async {
 });
 ```
 
-- **`install({bool includeTextInput = false})`** installs the mocks immediately
-  and removes them on teardown. Wire it into your test harness alongside the
-  other `easy_mock_*` installers.
+- **`mockSystemChannel.init()`** installs the mocks immediately and removes them
+  on teardown. Wire it into your test harness alongside the other `easy_mock_*`
+  mocks, after the unmocked-channel guard so it can wrap it.
 - **`mockSystemChannel.platform`** / `.navigation` / `.mouseCursor` /
   `.contextMenu` / `.restoration` — each is a `MockMethodChannel`, so use
   `.when(...)` to override and `.verify(...)` to assert. Reach any other channel

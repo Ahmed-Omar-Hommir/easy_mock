@@ -22,16 +22,16 @@ test('writes go to memory, not disk', () {
 });
 ```
 
-- **`MockMemoryIO.init([MemoryFileSystem? fs])`** installs the override. Pass
-  a pre-seeded filesystem to start with files already present; omit it for an
-  empty one.
+- **`MockMemoryIO.init([MemoryFileSystem? fs, MemoryIOConfig config])`** installs
+  the override. Pass a pre-seeded filesystem to start with files already present;
+  omit it for an empty one. `config` controls the asset seeding and root path.
 - **File locks are no-ops.** `lock` / `unlock` (sync and async) return
   immediately, so tests that open the same path in parallel can't deadlock on an
   exclusive lock the memory filesystem wouldn't honour anyway.
 - **Assets are seeded** from the folder named by the `UNIT_TEST_ASSETS`
   environment variable, and `/app_root` is created up front.
 
-`install` sets `IOOverrides.global`; reset it with `IOOverrides.global = null`
+`init` sets `IOOverrides.global`; reset it with `IOOverrides.global = null`
 in `tearDown` (or install a fresh one per test) so overrides don't leak.
 
 [`MemoryFileSystem`]: https://pub.dev/packages/file

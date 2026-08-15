@@ -4,7 +4,9 @@ description: >-
   package's own setMockInitialValues seam (it caches the result, so a raw
   channel mock would be unreliable).
 version: 0.1.0
-publish_to: none
+homepage: https://github.com/Ahmed-Omar-Hommir/easy_mock
+repository: https://github.com/Ahmed-Omar-Hommir/easy_mock
+issue_tracker: https://github.com/Ahmed-Omar-Hommir/easy_mock/issues
 
 environment:
   sdk: ^3.9.0
