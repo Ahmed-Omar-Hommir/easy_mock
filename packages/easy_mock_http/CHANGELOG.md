@@ -1,3 +1,8 @@
+# 0.3.0
+
+- Remove `mockHttp.expect`; use the `MockResult` returned by `mockHttp.when`
+  for explicit verification.
+
 # 0.2.3
 
 - Remove the deprecated `MockResult.verification` compatibility alias.

@@ -27,8 +27,7 @@ part of '../easy_mock_http.dart';
 // `greaterThan(3)` / `contains('x')` for finer checks.
 
 /// The HTTP mock. Call [MockHttp.init] to route `dart:io` traffic through
-/// it, then stub with [MockHttp.when] / [MockHttp.expect] and assert with
-/// [MockHttp.verify].
+/// it, then stub with [MockHttp.when] and assert with [MockHttp.verify].
 final mockHttp = MockHttp._();
 
 /// Matches any value in a body matcher, e.g. `{'id': any(), 'name': 'Sam'}`.
@@ -49,21 +48,14 @@ class MockHttp {
     _stubs.clear();
     overrides.requests.clear();
     HttpOverrides.global = overrides;
-    addTearDown(() {
-      HttpOverrides.global = null;
-      _verifyExpectations();
-    });
+    addTearDown(() => HttpOverrides.global = null);
   }
 
   /// Every request seen, in order — the raw recording for ad-hoc assertions.
   List<MockHttpRequest> get requests => overrides.requests;
 
   /// Stub a reply: `when.get(url, response: {...})`.
-  StubVerbs get when => StubVerbs._(this, expected: false);
-
-  /// Like [when], but also asserts the request actually arrives — verified on
-  /// teardown: `expect.get(url, response: {...})`.
-  StubVerbs get expect => StubVerbs._(this, expected: true);
+  StubVerbs get when => StubVerbs._(this);
 
   /// Assert what was sent: `verify.post(url, body: {...}).called(1)`.
   VerifyVerbs get verify => VerifyVerbs._(this);
@@ -71,7 +63,6 @@ class MockHttp {
   FutureOr<MockHttpResponse> _handle(MockHttpRequest request) {
     for (final stub in _stubs.reversed) {
       if (stub.matcher.matches(request)) {
-        stub.calls.add(request);
         return stub.responder(request);
       }
     }
@@ -79,14 +70,6 @@ class MockHttp {
       statusCode: 404,
       body: {'error': 'no mock route for $request'},
     );
-  }
-
-  void _verifyExpectations() {
-    for (final stub in _stubs) {
-      if (stub.expected && stub.calls.isEmpty) {
-        fail('Expected a request matching ${stub.matcher}, but none was sent.');
-      }
-    }
   }
 }
 

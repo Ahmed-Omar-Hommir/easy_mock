@@ -65,10 +65,8 @@ mockHttp.when.get(
 );
 ```
 
-`mockHttp.expect.get(...)` works like `when` but also fails the test on teardown
-if the request never arrives. Every `when` / `expect` verb returns a
-`MockResult`. It lazily verifies with the same method, URL, body, headers, and
-query matcher as that registration:
+Every `when` verb returns a `MockResult`. It lazily verifies with the same
+method, URL, body, headers, and query matcher as that registration:
 
 ```dart
 final result = mockHttp.when.post('/v1/login', response: {'token': 'abc'});

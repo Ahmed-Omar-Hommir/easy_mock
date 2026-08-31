@@ -1,6 +1,6 @@
 part of '../easy_mock_http.dart';
 
-/// HTTP-verb entry points for [MockHttp.when] / [MockHttp.expect].
+/// HTTP-verb entry points for [MockHttp.when].
 ///
 /// Request matching: [body], [query], and [headers] are subset matchers
 /// (extra keys on the real request are ignored; header names are
@@ -11,10 +11,9 @@ part of '../easy_mock_http.dart';
 /// request. Every verb returns a [MockResult] that lazily verifies requests
 /// using that exact registration matcher.
 class StubVerbs {
-  StubVerbs._(this._mock, {required this.expected});
+  StubVerbs._(this._mock);
 
   final MockHttp _mock;
-  final bool expected;
 
   MockResult _verb(
     String method,
@@ -42,7 +41,7 @@ class StubVerbs {
     }
 
     final matcher = _RequestMatcher(method, url, body, headers, query);
-    final stub = _Stub(matcher, expected)
+    final stub = _Stub(matcher)
       ..responder =
           responder ??
           (_) async {
@@ -225,10 +224,8 @@ final class MockResult extends LazyVerification {
 }
 
 class _Stub {
-  _Stub(this.matcher, this.expected);
+  _Stub(this.matcher);
 
   final _RequestMatcher matcher;
-  final bool expected;
-  final List<MockHttpRequest> calls = <MockHttpRequest>[];
   MockHttpHandler responder = (_) => MockHttpResponse(statusCode: 200);
 }
