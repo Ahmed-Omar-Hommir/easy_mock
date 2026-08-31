@@ -1,3 +1,27 @@
+# 0.2.3
+
+- Remove the deprecated `MockResult.verification` compatibility alias.
+
+# 0.2.2
+
+- Make `MockResult` extend `LazyVerification`, allowing direct assertions such
+  as `result.calledOnce`, `result.never`, and `result.calls`.
+- Keep `MockResult.verification` as a deprecated compatibility alias.
+
+# 0.2.1
+
+- Make `MockResult.verification` count every recorded request matching the
+  registration's method, URL, body, headers, and query, including requests
+  served by another registration with the same matcher.
+
+# 0.2.0
+
+- Replace `StubBuilder` with `MockResult`, returned directly by every
+  `when` / `expect` verb. `MockResult.verification` lazily verifies calls handled
+  by that exact registration.
+- Preserve dynamic replies through the new `responder` named argument.
+- Keep `mockHttp.verify` as the independent matcher-based verification API.
+
 # 0.1.0
 
 - Initial release: `mockHttp()` with fluent `when` / `expect` / `verify` verbs.

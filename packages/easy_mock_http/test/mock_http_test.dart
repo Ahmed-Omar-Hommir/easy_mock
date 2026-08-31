@@ -100,5 +100,52 @@ void main() {
       // Assert
       await expectLater(request, throwsA(isA<Exception>()));
     });
+
+    test('returns lazy verification using the registration matcher', () async {
+      // Arrange
+      final first = mockHttp.when.get(cardsUrl, response: {'source': 'first'});
+      final second = mockHttp.when.get(
+        cardsUrl,
+        response: {'source': 'second'},
+      );
+
+      expect(second.count, 0);
+
+      // Act
+      final response = await getProductsV1();
+
+      // Assert
+      expect(response, {'source': 'second'});
+      first.calledOnce;
+      second.calledOnce;
+      mockHttp.verify.get(cardsUrl).calledOnce;
+    });
+
+    test('supports a dynamic responder without a builder', () async {
+      // Arrange
+      final result = mockHttp.when.get(
+        cardsUrl,
+        responder: (request) =>
+            MockHttpResponse.json({'path': request.uri.path}),
+      );
+
+      // Act
+      final response = await getProductsV1();
+
+      // Assert
+      expect(response, {'path': '/api/cards'});
+      result.calledOnce;
+    });
+
+    test('rejects a responder combined with canned reply arguments', () {
+      expect(
+        () => mockHttp.when.get(
+          cardsUrl,
+          response: cards,
+          responder: (_) => MockHttpResponse(),
+        ),
+        throwsArgumentError,
+      );
+    });
   });
 }

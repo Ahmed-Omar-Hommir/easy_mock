@@ -7,15 +7,16 @@ part of '../easy_mock_http.dart';
 /// case-insensitive); any value may be exact or a [Matcher] like [any].
 /// Reply: [response] / [statusCode] / [responseHeaders] build the canned
 /// reply, [delay] postpones it, and [error] throws instead — simulating a
-/// transport failure. Omit all reply args to chain [StubBuilder.response] /
-/// [StubBuilder.replyWith].
+/// transport failure. Use [responder] to compute a reply from the matched
+/// request. Every verb returns a [MockResult] that lazily verifies requests
+/// using that exact registration matcher.
 class StubVerbs {
   StubVerbs._(this._mock, {required this.expected});
 
   final MockHttp _mock;
   final bool expected;
 
-  StubBuilder _verb(
+  MockResult _verb(
     String method,
     Object url,
     Object? body,
@@ -26,32 +27,44 @@ class StubVerbs {
     Map<String, String>? responseHeaders,
     Duration? delay,
     Object? error,
+    MockHttpHandler? responder,
   ) {
-    final builder = StubBuilder._(
-      _mock,
-      _RequestMatcher(method, url, body, headers, query),
-      expected,
-    );
-    final hasReply =
-        response != null ||
-        statusCode != null ||
-        delay != null ||
-        error != null;
-    if (hasReply) {
-      builder.replyWith((_) async {
-        if (delay != null) await Future<void>.delayed(delay);
-        if (error != null) throw error;
-        return MockHttpResponse(
-          statusCode: statusCode ?? 200,
-          body: response,
-          headers: responseHeaders,
-        );
-      });
+    if (responder != null &&
+        (response != null ||
+            statusCode != null ||
+            responseHeaders != null ||
+            delay != null ||
+            error != null)) {
+      throw ArgumentError(
+        'responder cannot be combined with response, statusCode, '
+        'responseHeaders, delay, or error.',
+      );
     }
-    return builder;
+
+    final matcher = _RequestMatcher(method, url, body, headers, query);
+    final stub = _Stub(matcher, expected)
+      ..responder =
+          responder ??
+          (_) async {
+            if (delay != null) await Future<void>.delayed(delay);
+            if (error != null) throw error;
+            return MockHttpResponse(
+              statusCode: statusCode ?? 200,
+              body: response,
+              headers: responseHeaders,
+            );
+          };
+    _mock._stubs.add(stub);
+
+    return MockResult._(
+      () => _Verification(
+        _mock.requests.where(matcher.matches).toList(),
+        '$matcher',
+      ),
+    );
   }
 
-  StubBuilder get(
+  MockResult get(
     Object url, {
     Object? body,
     Map<String, Object?>? headers,
@@ -61,6 +74,7 @@ class StubVerbs {
     Map<String, String>? responseHeaders,
     Duration? delay,
     Object? error,
+    MockHttpHandler? responder,
   }) => _verb(
     'GET',
     url,
@@ -72,9 +86,10 @@ class StubVerbs {
     responseHeaders,
     delay,
     error,
+    responder,
   );
 
-  StubBuilder post(
+  MockResult post(
     Object url, {
     Object? body,
     Map<String, Object?>? headers,
@@ -84,6 +99,7 @@ class StubVerbs {
     Map<String, String>? responseHeaders,
     Duration? delay,
     Object? error,
+    MockHttpHandler? responder,
   }) => _verb(
     'POST',
     url,
@@ -95,9 +111,10 @@ class StubVerbs {
     responseHeaders,
     delay,
     error,
+    responder,
   );
 
-  StubBuilder put(
+  MockResult put(
     Object url, {
     Object? body,
     Map<String, Object?>? headers,
@@ -107,6 +124,7 @@ class StubVerbs {
     Map<String, String>? responseHeaders,
     Duration? delay,
     Object? error,
+    MockHttpHandler? responder,
   }) => _verb(
     'PUT',
     url,
@@ -118,9 +136,10 @@ class StubVerbs {
     responseHeaders,
     delay,
     error,
+    responder,
   );
 
-  StubBuilder delete(
+  MockResult delete(
     Object url, {
     Object? body,
     Map<String, Object?>? headers,
@@ -130,6 +149,7 @@ class StubVerbs {
     Map<String, String>? responseHeaders,
     Duration? delay,
     Object? error,
+    MockHttpHandler? responder,
   }) => _verb(
     'DELETE',
     url,
@@ -141,9 +161,10 @@ class StubVerbs {
     responseHeaders,
     delay,
     error,
+    responder,
   );
 
-  StubBuilder patch(
+  MockResult patch(
     Object url, {
     Object? body,
     Map<String, Object?>? headers,
@@ -153,6 +174,7 @@ class StubVerbs {
     Map<String, String>? responseHeaders,
     Duration? delay,
     Object? error,
+    MockHttpHandler? responder,
   }) => _verb(
     'PATCH',
     url,
@@ -164,9 +186,10 @@ class StubVerbs {
     responseHeaders,
     delay,
     error,
+    responder,
   );
 
-  StubBuilder head(
+  MockResult head(
     Object url, {
     Object? body,
     Map<String, Object?>? headers,
@@ -176,6 +199,7 @@ class StubVerbs {
     Map<String, String>? responseHeaders,
     Duration? delay,
     Object? error,
+    MockHttpHandler? responder,
   }) => _verb(
     'HEAD',
     url,
@@ -187,44 +211,17 @@ class StubVerbs {
     responseHeaders,
     delay,
     error,
+    responder,
   );
 }
 
-/// Terminal of a `when`/`expect` chain: declares the canned reply.
-class StubBuilder {
-  StubBuilder._(this._mock, this._matcher, this._expected);
-
-  final MockHttp _mock;
-  final _RequestMatcher _matcher;
-  final bool _expected;
-
-  /// Reply with [body] (JSON-encoded) and [statusCode].
-  void response(
-    Object? body, {
-    int statusCode = 200,
-    Map<String, String>? headers,
-  }) => replyWith(
-    (_) =>
-        MockHttpResponse(statusCode: statusCode, body: body, headers: headers),
-  );
-
-  /// Alias for [response].
-  void reply(
-    Object? body, {
-    int statusCode = 200,
-    Map<String, String>? headers,
-  }) => response(body, statusCode: statusCode, headers: headers);
-
-  /// Reply with an error [statusCode] and an optional [body].
-  void fail(int statusCode, {Object? body}) =>
-      response(body, statusCode: statusCode);
-
-  /// Make the request throw [error] — simulates a socket/transport failure.
-  void throwError(Object error) => replyWith((_) => throw error);
-
-  /// Reply dynamically, computing the response from the matched request.
-  void replyWith(MockHttpHandler responder) =>
-      _mock._stubs.add(_Stub(_matcher, _expected)..responder = responder);
+/// The result of registering a canned HTTP interaction.
+///
+/// Verification is evaluated lazily using the method, URL, body, headers, and
+/// query supplied to the registration. Use [MockHttp.verify] for an independent
+/// matcher-based lookup.
+final class MockResult extends LazyVerification {
+  const MockResult._(super.verification);
 }
 
 class _Stub {

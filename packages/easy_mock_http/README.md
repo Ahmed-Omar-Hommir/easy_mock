@@ -20,7 +20,7 @@ import 'package:easy_mock_http/easy_mock_http.dart';
 test('ping replies pong', () async {
   // Arrange
   mockHttp.init();
-  mockHttp.when.get(
+  final result = mockHttp.when.get(
     'https://www.example.com/api/ping',
     response: {'pong': true},
   );
@@ -30,6 +30,7 @@ test('ping replies pong', () async {
 
   // Assert
   expect(response.data, {'pong': true});
+  result.calledOnce; // same matcher as the registration
   mockHttp.verify.get('/api/ping').calledOnce;
 });
 ```
@@ -49,18 +50,33 @@ mockHttp.when.post(
   responseHeaders: {...},    // reply headers
   delay: Duration(seconds: 1),        // postpone the reply
   error: SocketException('down'),     // throw instead of replying
+  responder: (request) => MockHttpResponse(...), // dynamic reply
 );
 ```
 
 Unmatched requests get a loud 404, so a typo'd URL fails the test instead of
-silently passing. For dynamic replies, chain instead:
+silently passing. `responder` cannot be combined with the canned reply
+arguments. A dynamic reply looks like this:
 
 ```dart
-mockHttp.when.get('/v1/time').replyWith((request) => MockHttpResponse.json({...}));
+mockHttp.when.get(
+  '/v1/time',
+  responder: (request) => MockHttpResponse.json({...}),
+);
 ```
 
 `mockHttp.expect.get(...)` works like `when` but also fails the test on teardown
-if the request never arrives.
+if the request never arrives. Every `when` / `expect` verb returns a
+`MockResult`. It lazily verifies with the same method, URL, body, headers, and
+query matcher as that registration:
+
+```dart
+final result = mockHttp.when.post('/v1/login', response: {'token': 'abc'});
+
+await login();
+
+result.calledOnce;
+```
 
 ## Verifying
 
@@ -70,6 +86,10 @@ mockHttp.verify.get('/v1/cities', query: {'page': 2}).called(2);
 mockHttp.verify.delete('/v1/session').never;
 mockHttp.requests;  // raw recording of everything sent
 ```
+
+`mockHttp.verify` remains independent of `MockResult`: it searches all recorded
+requests using the matcher supplied at verification time. Use it when the
+verification matcher differs from the registered route.
 
 ## Notes
 
