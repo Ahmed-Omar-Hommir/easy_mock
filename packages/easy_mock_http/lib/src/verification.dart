@@ -61,11 +61,11 @@ class VerifyVerbs {
 
 /// Verification of matching HTTP calls.
 ///
-/// Assert on the count, or read [calls] for deeper checks on the captured
+/// Assert on the count, or read [requests] for deeper checks on the captured
 /// requests.
 abstract interface class Verification {
   int get count;
-  List<MockHttpRequest> get calls;
+  List<MockHttpRequest> get requests;
   MockHttpRequest get single;
 
   void called(int times);
@@ -85,7 +85,7 @@ final class _Verification implements Verification {
   int get count => _matched.length;
 
   @override
-  List<MockHttpRequest> get calls => List.unmodifiable(_matched);
+  List<MockHttpRequest> get requests => List.unmodifiable(_matched);
 
   @override
   MockHttpRequest get single => _matched.single;
@@ -146,7 +146,7 @@ class LazyVerification implements Verification {
   void get calledOnce => _verification().calledOnce;
 
   @override
-  List<MockHttpRequest> get calls => _verification().calls;
+  List<MockHttpRequest> get requests => _verification().requests;
 
   @override
   int get count => _verification().count;

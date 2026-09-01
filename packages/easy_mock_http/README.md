@@ -82,7 +82,8 @@ result.calledOnce;
 mockHttp.verify.post('/v1/login', body: {'user': 'sam'}).calledOnce;
 mockHttp.verify.get('/v1/cities', query: {'page': 2}).called(2);
 mockHttp.verify.delete('/v1/session').never;
-mockHttp.requests;  // raw recording of everything sent
+mockHttp.verify.get('/v1/login').requests; // matching requests
+mockHttp.requests;                         // all requests
 ```
 
 `mockHttp.verify` remains independent of `MockResult`: it searches all recorded

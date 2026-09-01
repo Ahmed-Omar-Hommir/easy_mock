@@ -118,7 +118,10 @@ void main() {
       expect(response, {'source': 'second'});
       first.calledOnce;
       second.calledOnce;
-      mockHttp.verify.get(cardsUrl).calledOnce;
+      expect(first.requests, hasLength(1));
+      final verification = mockHttp.verify.get(cardsUrl);
+      verification.calledOnce;
+      expect(verification.requests, hasLength(1));
     });
 
     test('supports a dynamic responder without a builder', () async {

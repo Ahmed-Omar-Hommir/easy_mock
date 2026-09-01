@@ -3,7 +3,7 @@ description: >-
   Transport-agnostic HTTP mocking for Flutter VM tests. Intercepts dart:io's
   HttpClient via HttpOverrides, so Dio, http, or any client is mocked with
   zero injection — stub with when, assert with verify.
-version: 0.3.0
+version: 0.4.0
 homepage: https://github.com/Ahmed-Omar-Hommir/easy_mock
 repository: https://github.com/Ahmed-Omar-Hommir/easy_mock
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/easy_mock/issues

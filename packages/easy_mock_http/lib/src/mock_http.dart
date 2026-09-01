@@ -38,7 +38,7 @@ Matcher any() => anything;
 class MockHttp {
   MockHttp._();
 
-  late final MockHttpOverrides overrides = MockHttpOverrides(_handle);
+  late final MockHttpOverrides _overrides = MockHttpOverrides(_handle);
   final List<_Stub> _stubs = <_Stub>[];
 
   /// Installs this mock as `HttpOverrides.global`, resetting stubs and recorded
@@ -46,13 +46,13 @@ class MockHttp {
   /// `http.Client`, repositories) AFTER this call so they pick up the override.
   void init() {
     _stubs.clear();
-    overrides.requests.clear();
-    HttpOverrides.global = overrides;
+    _overrides.requests.clear();
+    HttpOverrides.global = _overrides;
     addTearDown(() => HttpOverrides.global = null);
   }
 
   /// Every request seen, in order — the raw recording for ad-hoc assertions.
-  List<MockHttpRequest> get requests => overrides.requests;
+  List<MockHttpRequest> get requests => _overrides.requests;
 
   /// Stub a reply: `when.get(url, response: {...})`.
   StubVerbs get when => StubVerbs._(this);

@@ -1,3 +1,10 @@
+# 0.4.0
+
+- Make the `MockHttpOverrides` instance private; recorded requests remain
+  available through `mockHttp.requests`.
+- Rename `Verification.calls` to `Verification.requests` for consistency with
+  `mockHttp.requests`.
+
 # 0.3.0
 
 - Remove `mockHttp.expect`; use the `MockResult` returned by `mockHttp.when`
