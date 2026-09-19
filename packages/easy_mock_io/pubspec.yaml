@@ -1,11 +1,11 @@
 name: easy_mock_io
 description: >-
-  In-memory dart:io for Flutter tests. MockMemoryIO.init() swaps
+  In-memory dart:io for Flutter tests. mockMemoryIO.init() swaps
   IOOverrides.global for a MemoryFileSystem, so File and Directory access runs in
   memory and never touches disk. File locks are no-ops (parallel tests can't
   deadlock on the same file), the UNIT_TEST_ASSETS folder is seeded into the
-  memory filesystem, and /app_root is pre-created.
-version: 0.1.0
+  memory filesystem, and application directories under /app_root are pre-created.
+version: 0.1.1
 homepage: https://github.com/Ahmed-Omar-Hommir/easy_mock
 repository: https://github.com/Ahmed-Omar-Hommir/easy_mock
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/easy_mock/issues

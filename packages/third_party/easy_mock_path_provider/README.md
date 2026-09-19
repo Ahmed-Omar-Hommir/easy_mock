@@ -26,7 +26,7 @@ void main() {
 
   test('uses default paths', () async {
     final directory = await getApplicationDocumentsDirectory();
-    expect(directory.path, '/mock/path_provider/documents');
+    expect(directory.path, '/app_root/documents');
   });
 
   test('overrides paths', () async {
@@ -51,23 +51,23 @@ Omitted or null arguments retain the current value.
 
 | `set` argument | Default value |
 | --- | --- |
-| `temporaryPath` | `/mock/path_provider/temporary` |
-| `applicationSupportPath` | `/mock/path_provider/support` |
-| `libraryPath` | `/mock/path_provider/library` |
-| `applicationDocumentsPath` | `/mock/path_provider/documents` |
-| `applicationCachePath` | `/mock/path_provider/cache` |
-| `externalStoragePath` | `/mock/path_provider/external` |
-| `externalCachePaths` | `['/mock/path_provider/external_cache']` |
-| `externalStoragePaths` | `['/mock/path_provider/external']` |
-| `downloadsPath` | `/mock/path_provider/downloads` |
+| `temporaryPath` | `/app_root/tmp` |
+| `applicationSupportPath` | `/app_root/support` |
+| `libraryPath` | `/app_root/library` |
+| `applicationDocumentsPath` | `/app_root/documents` |
+| `applicationCachePath` | `/app_root/cache` |
+| `externalStoragePath` | `/app_root/external/files` |
+| `externalCachePaths` | `['/app_root/external/cache']` |
+| `externalStoragePaths` | `['/app_root/external/files']` |
+| `downloadsPath` | `/app_root/downloads` |
 
 `getExternalStorageDirectories(type: StorageDirectory.downloads)` appends
 `/downloads` to each configured `externalStoragePaths` base path. Other storage
 types append their enum name. Passing an empty list returns no directories.
 
-The mock supplies paths only; it does not create directories. For tests that
-write files, use temporary directories you create yourself or pair this helper
-with `easy_mock_io` and create the directories in its in-memory filesystem.
+The mock supplies paths only; it does not create directories or perform any
+filesystem operations. Tests that write files must provide a filesystem with
+the required directories, including any custom path overrides.
 
 ## Loading and failure states
 

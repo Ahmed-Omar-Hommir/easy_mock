@@ -1,3 +1,10 @@
+## 0.1.1
+
+- Move default paths under `/app_root`.
+  Temporary storage uses `/app_root/tmp`; external storage and cache use
+  `/app_root/external/files` and `/app_root/external/cache`.
+- Custom path overrides still require caller-created directories.
+
 ## 0.1.0
 
 - Built on `easy_mock_channel` with no dependency on the real plugin.

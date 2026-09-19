@@ -40,15 +40,15 @@ void main() {
 
   test('every directory channel method has a default', () async {
     expect(await directoryPaths(), {
-      'temporary': '/mock/path_provider/temporary',
-      'support': '/mock/path_provider/support',
-      'library': '/mock/path_provider/library',
-      'documents': '/mock/path_provider/documents',
-      'cache': '/mock/path_provider/cache',
-      'external': '/mock/path_provider/external',
-      'externalCaches': ['/mock/path_provider/external_cache'],
-      'externalStorage': ['/mock/path_provider/external'],
-      'downloads': '/mock/path_provider/downloads',
+      'temporary': '/app_root/tmp',
+      'support': '/app_root/support',
+      'library': '/app_root/library',
+      'documents': '/app_root/documents',
+      'cache': '/app_root/cache',
+      'external': '/app_root/external/files',
+      'externalCaches': ['/app_root/external/cache'],
+      'externalStorage': ['/app_root/external/files'],
+      'downloads': '/app_root/downloads',
     });
   });
 
@@ -86,7 +86,7 @@ void main() {
     expect(await readPath('getApplicationDocumentsDirectory'), '/test/docs');
     expect(
       await readPath('getApplicationSupportDirectory'),
-      '/mock/path_provider/support',
+      '/app_root/support',
     );
   });
 
@@ -195,7 +195,7 @@ void main() {
     expect(completed, isFalse);
     await tester.pump(const Duration(milliseconds: 1));
     expect(completed, isTrue);
-    expect(await lookup, '/mock/path_provider/temporary');
+    expect(await lookup, '/app_root/tmp');
   });
 
   testWidgets('repeated init resets paths, delay, and errors', (tester) async {
@@ -218,7 +218,7 @@ void main() {
     // No clock advance is needed after resetting the delay.
     expect(await directoryPaths(), defaults);
     expect(await readPaths('getExternalStorageDirectories', {'type': 7}), [
-      '/mock/path_provider/external/downloads',
+      '/app_root/external/files/downloads',
     ]);
   });
 }

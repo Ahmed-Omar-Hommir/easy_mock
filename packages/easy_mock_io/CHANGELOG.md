@@ -1,3 +1,10 @@
+## 0.1.1
+
+- Pre-create application directories under `/app_root`, including common
+  external-storage categories.
+- Create the same layout under `MemoryIOConfig.rootDirPath` for custom roots,
+  preserving files in a supplied filesystem.
+
 ## 0.1.0
 
 - Initial release.

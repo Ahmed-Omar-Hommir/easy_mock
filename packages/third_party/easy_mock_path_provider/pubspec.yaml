@@ -3,7 +3,7 @@ description: >-
   Readable test mock for the path_provider method channel, built on
   easy_mock_channel. Provides default directory paths and simple overrides
   with no dependency on path_provider.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/Ahmed-Omar-Hommir/easy_mock
 repository: https://github.com/Ahmed-Omar-Hommir/easy_mock
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/easy_mock/issues

@@ -4,15 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 const _channelName = 'plugins.flutter.io/path_provider';
 
 const _defaults = <String, Object>{
-  'getTemporaryDirectory': '/mock/path_provider/temporary',
-  'getApplicationSupportDirectory': '/mock/path_provider/support',
-  'getLibraryDirectory': '/mock/path_provider/library',
-  'getApplicationDocumentsDirectory': '/mock/path_provider/documents',
-  'getApplicationCacheDirectory': '/mock/path_provider/cache',
-  'getStorageDirectory': '/mock/path_provider/external',
-  'getExternalCacheDirectories': ['/mock/path_provider/external_cache'],
-  'getExternalStorageDirectories': ['/mock/path_provider/external'],
-  'getDownloadsDirectory': '/mock/path_provider/downloads',
+  'getTemporaryDirectory': '/app_root/tmp',
+  'getApplicationSupportDirectory': '/app_root/support',
+  'getLibraryDirectory': '/app_root/library',
+  'getApplicationDocumentsDirectory': '/app_root/documents',
+  'getApplicationCacheDirectory': '/app_root/cache',
+  'getStorageDirectory': '/app_root/external/files',
+  'getExternalCacheDirectories': ['/app_root/external/cache'],
+  'getExternalStorageDirectories': ['/app_root/external/files'],
+  'getDownloadsDirectory': '/app_root/downloads',
 };
 
 // StorageDirectory's wire indices, so no path_provider dependency is needed.
@@ -40,7 +40,7 @@ final mockPathProvider = MockPathProvider._();
 
 /// Mocks `plugins.flutter.io/path_provider` through easy_mock_channel.
 ///
-/// Defaults to paths under `/mock/path_provider`. Supplies paths without
+/// Defaults to paths under `/app_root`. Supplies paths without
 /// creating directories. Implementations using other channels, Pigeon, or FFI
 /// are outside the scope of this method-channel mock.
 class MockPathProvider {

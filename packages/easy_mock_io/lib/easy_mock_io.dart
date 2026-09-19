@@ -15,6 +15,8 @@ class MemoryIOConfig {
     this.testAssetsDirPath = 'test/assets',
   });
 
+  /// Root for the pre-created application directories, including documents,
+  /// cache, downloads, and external storage.
   final String rootDirPath;
   final String testAssetsDirPath;
 }
@@ -22,6 +24,9 @@ class MemoryIOConfig {
 class MockMemoryIO {
   const MockMemoryIO._();
 
+  /// Installs an in-memory filesystem with application directories ready for use.
+  ///
+  /// A custom [MemoryIOConfig.rootDirPath] moves the layout under that root.
   void init([
     MemoryFileSystem? memoryFile,
     MemoryIOConfig config = const MemoryIOConfig(),
@@ -30,9 +35,36 @@ class MockMemoryIO {
     _seedProjectAssets(mf);
     _seedAssets(mf, config);
 
-    mf.directory(config.rootDirPath).createSync(recursive: true);
+    _seedApplicationDirectories(mf, config);
 
     IOOverrides.global = MemoryIOOverrides(mf);
+  }
+}
+
+void _seedApplicationDirectories(MemoryFileSystem fs, MemoryIOConfig config) {
+  const directories = [
+    'tmp',
+    'support',
+    'library',
+    'documents',
+    'cache',
+    'downloads',
+    'external/cache',
+    'external/files',
+    'external/files/music',
+    'external/files/podcasts',
+    'external/files/ringtones',
+    'external/files/alarms',
+    'external/files/notifications',
+    'external/files/pictures',
+    'external/files/movies',
+    'external/files/downloads',
+    'external/files/dcim',
+    'external/files/documents',
+  ];
+  for (final directory in directories) {
+    final path = fs.path.joinAll([config.rootDirPath, ...directory.split('/')]);
+    fs.directory(path).createSync(recursive: true);
   }
 }
 
