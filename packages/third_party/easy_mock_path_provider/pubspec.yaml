@@ -1,0 +1,22 @@
+name: easy_mock_path_provider
+description: >-
+  Readable test mock for the path_provider method channel, built on
+  easy_mock_channel. Provides default directory paths and simple overrides
+  with no dependency on path_provider.
+version: 0.1.0
+homepage: https://github.com/Ahmed-Omar-Hommir/easy_mock
+repository: https://github.com/Ahmed-Omar-Hommir/easy_mock
+issue_tracker: https://github.com/Ahmed-Omar-Hommir/easy_mock/issues
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  easy_mock_channel: ^0.1.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

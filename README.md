@@ -30,6 +30,7 @@ Each mocks one specific pub.dev package. They live under `packages/third_party/`
 | [`easy_mock_permission_handler`](packages/third_party/easy_mock_permission_handler) | [`permission_handler`](https://pub.dev/packages/permission_handler) channel (camera & notification) | No |
 | [`easy_mock_device_info`](packages/third_party/easy_mock_device_info) | [`device_info_plus`](https://pub.dev/packages/device_info_plus) `getDeviceInfo` | No |
 | [`easy_mock_package_info`](packages/third_party/easy_mock_package_info) | [`package_info_plus`](https://pub.dev/packages/package_info_plus) via its `setMockInitialValues` seam | Yes (by design) |
+| [`easy_mock_path_provider`](packages/third_party/easy_mock_path_provider) | [`path_provider`](https://pub.dev/packages/path_provider) method channel with default directory paths | No |
 | [`easy_mock_firebase`](packages/third_party/easy_mock_firebase) | Firebase core / performance / remote config / messaging / app check / crashlytics channels | Partially (platform interfaces) |
 | [`easy_mock_local_notifications`](packages/third_party/easy_mock_local_notifications) | [`flutter_local_notifications`](https://pub.dev/packages/flutter_local_notifications) channel | Yes (registers the real Android plugin) |
 
@@ -50,6 +51,7 @@ packages/
     easy_mock_permission_handler/
     easy_mock_device_info/
     easy_mock_package_info/
+    easy_mock_path_provider/
     easy_mock_firebase/
     easy_mock_local_notifications/
 ```
