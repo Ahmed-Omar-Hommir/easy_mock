@@ -1,3 +1,9 @@
+## 0.1.1
+
+- Reuse the existing mock when `mockChannel(name)` is called again in the same
+  test, preserving stubs, call history, and the originally installed codec.
+- Clear the channel registry at teardown so state does not leak between tests.
+
 ## 0.1.0
 
 - Initial release.

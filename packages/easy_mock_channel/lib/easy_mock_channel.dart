@@ -81,9 +81,13 @@ final mockChannel = MockChannel._();
 class MockChannel {
   MockChannel._();
 
+  final Map<String, MockMethodChannel> _channels = {};
+
   /// Stubs a platform [MethodChannel] in tests with a fluent `when` API and
   /// records every call for verification. The mock handler is installed
   /// immediately and removed automatically on test teardown.
+  /// Repeated calls with the same name return the existing mock, preserving
+  /// its stubs and recorded calls. Each test starts with a fresh registry.
   ///
   /// ```dart
   /// final channel = mockChannel('flutter.baseflow.com/permissions/methods');
@@ -95,11 +99,20 @@ class MockChannel {
   ///
   /// Pass [codec] for channels that don't use the default [StandardMethodCodec]
   /// (e.g. `flutter/platform` uses [JSONMethodCodec]) — it must match the real
-  /// channel's codec or messages won't decode.
+  /// channel's codec or messages won't decode. The first call chooses the
+  /// codec; subsequent calls reuse the installed handler and its codec.
   MockMethodChannel call(
     String name, {
     MethodCodec codec = const StandardMethodCodec(),
-  }) => MockMethodChannel(name, codec: codec);
+  }) {
+    final existing = _channels[name];
+    if (existing != null) return existing;
+
+    final channel = MockMethodChannel(name, codec: codec);
+    _channels[name] = channel;
+    addTearDown(() => _channels.remove(name));
+    return channel;
+  }
 
   /// Fails the current test if the app sends a message on a platform channel
   /// that has no registered mock, instead of hanging on the real platform or

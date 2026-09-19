@@ -21,7 +21,8 @@ testWidgets('camera permission is denied', (tester) async {
 ```
 
 - **`mockChannel(name)`** installs the handler immediately and removes it on
-  test teardown.
+  test teardown. Calling it again with the same name returns the existing mock,
+  preserving its stubs and call history. Each test starts fresh.
 - **`when({required method, arguments, returns, throws})`** — reply with
   `returns`, or throw `throws` (e.g. a `PlatformException`). Supply `arguments`
   to match only calls whose `arguments` deep-equal it; omit it to match any.
@@ -30,6 +31,21 @@ testWidgets('camera permission is denied', (tester) async {
   method; **`calls`** is the full ordered list.
 
 > `return` is a reserved word in Dart, so the parameter is named `returns`.
+
+You can configure and inspect the same channel from different helpers:
+
+```dart
+mockChannel('example/settings').when(method: 'theme', returns: 'dark');
+mockChannel('example/settings').when(method: 'language', returns: 'en');
+
+// Both stubs remain active. Looking up the channel does not reset it.
+final channel = mockChannel('example/settings');
+expect(channel.verify(method: 'theme').length, 0);
+```
+
+The first call selects the channel's codec. Later lookups retain that codec,
+so a channel initially installed with `codec: const JSONMethodCodec()` can be
+looked up again with just `mockChannel(name)`.
 
 ## Notes
 
